@@ -1,1 +1,1 @@
-"# quakewatch" 
+# quakewatch
