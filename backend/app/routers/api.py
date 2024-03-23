@@ -4,10 +4,13 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from fastapi_another_jwt_auth import AuthJWT
 from fastapi import APIRouter, Request, Response, Depends
+from sqlalchemy.orm import Session
 
+from .. import crud, models, schemas
 from .. import utils
 from .. import middleware
 from .. import constants as CONSTANTS
+from ..utils import get_db
 
 router = APIRouter()
 limiter = Limiter(
@@ -42,11 +45,12 @@ async def handle_request(query_type: str, request: Request, response: Response, 
     return {"data": await middleware.dispatch(query_type, utils.hashabledict(request.query_params))}
     
 @router.post("/auth")
-async def handle_auth(request: Request, Authorize: AuthJWT = Depends()):
+async def handle_auth(request: Request, Authorize: AuthJWT = Depends(), 
+                      db: Session = Depends(get_db)):
     data = await request.json()
-    #! THIS IS JUST FOR TESTING PURPOSES
-    if not (auth_key:=data.get("auth-key")) or auth_key != "a6a5cefe-8bef-4041-9506-2f5321fe57a4": 
+
+    if not (auth_key:=data.get("auth-key")) or not (key:=crud.get_key_from_value(db, auth_key)): 
         return {"msg": "Unauthorized."}
     
     return {"access_token": Authorize.create_access_token(subject=auth_key,
-                                                      user_claims={"plan_type": data.get("plan", "basic")})}
+                                                      user_claims={"plan_type": key.plan})}

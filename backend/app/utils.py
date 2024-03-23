@@ -2,6 +2,7 @@ import logging
 from functools import wraps
 
 from .constants import LOGGER_NAME
+from .database import SessionLocal
 
 
 class hashabledict(dict):
@@ -27,3 +28,10 @@ def setup_logging() -> logging.Logger:
  
 	logger.addHandler(handler)
 	return logger
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

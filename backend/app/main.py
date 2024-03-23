@@ -9,6 +9,10 @@ from slowapi.errors import RateLimitExceeded
 from .utils import setup_logging
 from .routers import api
 from .constants import DEFAULT_JWT_SECRET_KEY
+from .database import engine
+from . import crud, models, schemas
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 logger = setup_logging()

@@ -4,3 +4,6 @@ requests
 uvicorn
 fastapi
 slowapi[redis]
+sqlalchemy
+mysqlclient
+bcrypt

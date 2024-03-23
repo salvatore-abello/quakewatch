@@ -5,10 +5,11 @@ services:
     build: ./backend
     restart: always
     environment:
-      - DB_PASSWORD=$DB_PASSWORD
+      - DB_PASSWORD=$DB_ROOT_PASSWORD
       - DB_USERNAME=$DB_USERNAME
+      - MYSQL_DATABASE=$MYSQL_DATABASE
     depends_on:
-      - db
+      - database
       - redis
 
   nginx: # 8080 -> 80
@@ -20,12 +21,13 @@ services:
     depends_on:
      - backend
 
-  db: # 3306
+  database: # 3306
     image: mysql
-    restart: always
     volumes:
       - ./db/db_data:/var/lib/mysql
+      - ./mysql:/docker-entrypoint-initdb.d
     environment: 
+      - MYSQL_DATABASE=$MYSQL_DATABASE
       - MYSQL_ROOT_PASSWORD=$DB_ROOT_PASSWORD
       - MYSQL_DB_USERNAME=$DB_USERNAME
       - MYSQL_DB_PASSWORD=$DB_PASSWORD
@@ -34,7 +36,6 @@ services:
   redis: # 6379 -> https://dev.to/vjnvisakh/redis-container-and-persisting-939 
     image: redis
     command: sh -c "redis-server --save 60 1 --loglevel warning"
-    restart: always
     volumes:
       - ./redis/data:/data
       

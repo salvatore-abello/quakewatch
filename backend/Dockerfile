@@ -9,7 +9,7 @@ RUN pip install -r requirements.txt
 RUN groupadd appgroup && useradd -g appgroup appuser
 RUN apt-get update \
     && apt-get upgrade -y\
-    && apt install -y supervisor
+    && apt install -y supervisor default-mysql-client
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
