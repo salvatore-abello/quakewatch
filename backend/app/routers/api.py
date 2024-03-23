@@ -43,14 +43,14 @@ def plan_based_rate_limiter(f): # return await limiter.limit(LIMITS[plan_type])(
 @plan_based_rate_limiter
 async def handle_request(query_type: str, request: Request, response: Response, Authorize: AuthJWT = Depends()):
     return {"data": await middleware.dispatch(query_type, utils.hashabledict(request.query_params))}
-    
+
 @router.post("/auth")
 async def handle_auth(request: Request, Authorize: AuthJWT = Depends(), 
                       db: Session = Depends(get_db)):
     data = await request.json()
-
+    
     if not (auth_key:=data.get("auth-key")) or not (key:=crud.get_key_from_value(db, auth_key)): 
         return {"msg": "Unauthorized."}
     
     return {"access_token": Authorize.create_access_token(subject=auth_key,
-                                                      user_claims={"plan_type": key.plan})}
+                                                    user_claims={"plan_type": key.plan})}

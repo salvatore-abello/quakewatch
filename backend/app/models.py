@@ -12,16 +12,14 @@ class User(Base):
     email = Column(String(64), unique=True, index=True)
     name = Column(String(30))
     surname = Column(String(30))
-    password = Column(String(60))
 
     key = relationship("Key", uselist=False, back_populates="user")
-
 
 class Plan(Base):
     __tablename__ = "Plans"
 
     IDPlan = Column(Integer, primary_key=True)
-    type = Column(Integer)
+    type = Column(String(16))
     
     keys = relationship("Key", back_populates="plan")
 
@@ -33,7 +31,6 @@ class Key(Base):
 
     CODPlan = Column(Integer, ForeignKey("Plans.IDPlan"))
     CODUser = Column(Integer, ForeignKey("Users.IDUser"))
-
 
     user = relationship("User", back_populates="key")
     plan = relationship("Plan", back_populates="keys")

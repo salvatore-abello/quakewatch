@@ -1,16 +1,17 @@
 import os
 from pydantic import BaseModel
 from fastapi import FastAPI, Request
+from contextlib import asynccontextmanager
 from fastapi.responses import JSONResponse
 from fastapi_another_jwt_auth import AuthJWT
 from fastapi_another_jwt_auth.exceptions import AuthJWTException
 from slowapi.errors import RateLimitExceeded
 
+from .constants import DEFAULT_JWT_SECRET_KEY, LIMITS
 from .utils import setup_logging
+from .database import engine, SessionLocal
 from .routers import api
-from .constants import DEFAULT_JWT_SECRET_KEY
-from .database import engine
-from . import crud, models, schemas
+from . import models
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -39,6 +40,22 @@ def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded):
 @AuthJWT.load_config
 def get_config():
     return Settings()
+
+def populate_database():
+    db = SessionLocal()
+    if not db.query(models.Plan).first():
+        default_plans = [{"type": x} for x in LIMITS]
+        for plan in default_plans:
+            plan = models.Plan(**plan)
+            db.add(plan)
+        db.commit()
+    db.close()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    populate_database()
+    yield
+
 
 app.include_router(api.router)
 app.state.limiter = api.limiter
