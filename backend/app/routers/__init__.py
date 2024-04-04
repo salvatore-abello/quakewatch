@@ -33,3 +33,12 @@ def query_plan_based_rate_limiter(f): # return await limiter.limit(LIMITS[plan_t
         return await todecorate(*args, **kwargs)
 
     return wrapper
+
+def login_required(f):
+    @functools.wraps(f)
+    async def wrapper(*args, **kwargs):
+        Authorize = kwargs["Authorize"]
+        Authorize.jwt_required()
+
+        return await f(*args, **kwargs)
+    return wrapper

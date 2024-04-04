@@ -1,16 +1,10 @@
-import json
-import functools
-from typing import Annotated
 from fastapi_another_jwt_auth import AuthJWT
 from fastapi import APIRouter, Request, Response, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from .. import crud, models, schemas
-from .. import utils
-from .. import middleware
-from .. import constants as CONSTANTS
+from .. import crud, schemas
 from ..utils import get_db
 
 
@@ -37,7 +31,7 @@ async def handle_register(request: Request, user: schemas.UserCreate,
         return JSONResponse(content={"msg": "Email already in use"}, status_code=400)
     
 @router.post("/login")
-async def handle_auth(request: Request, user: schemas.UserLogin, 
+async def handle_login(request: Request, user: schemas.UserLogin, 
                       db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
     if crud.check_login(db, user):
         access_token = Authorize.create_access_token(subject=user.email)
