@@ -1,4 +1,5 @@
 import logging
+import bcrypt
 from functools import wraps
 
 from .constants import LOGGER_NAME
@@ -6,11 +7,7 @@ from .database import SessionLocal
 
 
 class hashabledict(dict):
-	"""
-	A subclass of the built-in dict class that supports hashing.
-	This allows instances of hashabledict to be used as keys in dictionaries and elements in sets.
-	"""
- 
+	""" A subclass of the built-in dict class that supports hashing. """
 	def __key(self) -> tuple:
 		return tuple((k,self[k]) for k in sorted(self))
 	def __hash__(self) -> int:
@@ -35,3 +32,9 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def hash_psw(password: str) -> str:
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode()
+
+def check_psw(password: str, hashed: str) -> bool:
+	return bcrypt.checkpw(password.encode('utf-8'), hashed.encode())

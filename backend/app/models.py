@@ -12,6 +12,7 @@ class User(Base):
     email = Column(String(64), unique=True, index=True)
     name = Column(String(30))
     surname = Column(String(30))
+    password = Column(String(60))
 
     key = relationship("Key", uselist=False, back_populates="user")
 

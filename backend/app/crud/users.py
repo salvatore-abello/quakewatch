@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from .. import models, schemas
-
+from ..utils import hash_psw, check_psw
 
 def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.IDUser == user_id).first()
@@ -11,10 +11,15 @@ def get_user_by_email(db: Session, email: str):
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
+def check_login(db: Session, user: schemas.UserLogin) -> bool:
+    db_user = get_user_by_email(db, user.email)
+    return db_user and check_psw(user.password, db_user.password)
+
 def create_user(db: Session, user: schemas.UserCreate):
     db_user = models.User(email=user.email, 
                           name=user.name, 
-                          surname=user.surname)
+                          surname=user.surname,
+                          password=hash_psw(user.password))
 
     db.add(db_user)
     db.commit()

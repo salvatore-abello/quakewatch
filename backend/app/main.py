@@ -10,16 +10,22 @@ from slowapi.errors import RateLimitExceeded
 from .constants import DEFAULT_JWT_SECRET_KEY, LIMITS
 from .utils import setup_logging
 from .database import engine, SessionLocal
-from .routers import api
+from .routers import query, auth, limiter
 from . import models
 
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    populate_database()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 logger = setup_logging()
 
 class Settings(BaseModel):
     authjwt_secret_key: str = os.getenv("JWT_SECRET_KEY", DEFAULT_JWT_SECRET_KEY)
+    authjwt_token_location: set = {"cookies", "headers"}
     if authjwt_secret_key == DEFAULT_JWT_SECRET_KEY:
         logger.warning("Using default JWT secret key. DO NOT RUN ON PRODUCTION!")
 
@@ -36,26 +42,22 @@ def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded):
         status_code=exc.status_code,
         content={"msg": f"Rate limit Exceeded"}
     )
-    
+
 @AuthJWT.load_config
 def get_config():
     return Settings()
 
 def populate_database():
-    db = SessionLocal()
-    if not db.query(models.Plan).first():
-        default_plans = [{"type": x} for x in LIMITS]
-        for plan in default_plans:
-            plan = models.Plan(**plan)
-            db.add(plan)
-        db.commit()
-    db.close()
+    # db = SessionLocal()
+    # if not db.query(models.Plan).first():
+    #     default_plans = [{"type": x} for x in LIMITS]
+    #     for plan in default_plans:
+    #         plan = models.Plan(**plan)
+    #         db.add(plan)
+    #     db.commit()
+    # db.close()
+    pass
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    populate_database()
-    yield
-
-
-app.include_router(api.router)
-app.state.limiter = api.limiter
+app.include_router(query.router)
+app.include_router(auth.router)
+app.state.limiter = limiter
