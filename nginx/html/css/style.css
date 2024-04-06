@@ -37,6 +37,7 @@
     box-sizing: border-box !important;
     transition: ease all 0.5s;
 }
+li { cursor: pointer; }
 
 html {
     scroll-behavior: smooth;
@@ -234,7 +235,6 @@ button {
     background-image: url(../images/img.png);
     height: auto;
     background-size: 100%;
-    padding: 0px 0px 20px 0px;
 }
 
 .bg-light {
@@ -351,7 +351,7 @@ button {
 .banner_section {
     width: 100%;
     float: left;
-    padding-bottom: 305px;
+    padding-bottom: 15rem;
 }
 
 .banner_taital {
@@ -532,7 +532,7 @@ button {
 
 .about_img {
     width: 100%;
-    float: left;
+    
 }
 
 
