@@ -10,6 +10,8 @@ def earthquake_query(data):
     # TODO: Check if GET requests are enough
     return requests.request("GET", CONSTANTS.EARTHQUAKE_API_ENDPOINT, params=data).json()
 
+def get_earthquake_history():pass
+
 # @cached(cache=TTLCache(maxsize=640*512, getsizeof=len, ttl=2 * 60 * 60), lock=Lock()) # TTL 1h
 # def weather_query(data):
 #     # pioggia moderata (4 – 6 mm/h) pioggia forte (> 6 mm/h) rovescio (> 10 mm/h) nubifragio (> 30 mm/h)

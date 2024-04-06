@@ -5,16 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-    <style> #map { height: 180px; } </style>
+    <style> #map { height: 100vh; } </style>
 </head>
 <body>
     <div id="map"></div>
+    
+    <script src="/js/simpleheat.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://www.unpkg.com/leaflet.heat@0.2.0/src/HeatLayer.js"></script>
+    <script src="https://unpkg.com/pouchdb@^5.2.0/dist/pouchdb.js"></script>
+	<script src="https://unpkg.com/leaflet.tilelayer.pouchdbcached@latest/L.TileLayer.PouchDBCached.js"></script>
+
+    <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+    <script src="https://d3js.org/d3-hexbin.v0.2.min.js"></script>
+    <script src="https://unpkg.com/@asymmetrik/leaflet-d3@4/dist/leaflet-d3.js" charset="utf-8"></script>
+
     <script>
 
         let latitude;
         let longitude;
         let map;
+
+        geoJson2heat = function(geojson) {
+return geojson.features.map(function(feature) {
+return [parseFloat(feature.geometry.coordinates[1]), 
+        parseFloat(feature.geometry.coordinates[0]), feature.properties.mag]//;
+});
+}
 
         function showPosition(position) {
             latitude = position.coords.latitude;
@@ -26,19 +43,94 @@
         }
 
         function main(){
-            map = L.map('map').setView([latitude, longitude], 13);
+            map = L.map('map', {    reuseTiles: true, 
+    unloadInvisibleTiles: true}).setView([latitude, longitude], 8);
 
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                useCache: true,
+	crossOrigin: true
             }).addTo(map);
+            
+            L.Control.Layers.include({
+	_checkDisabledLayers: function (){
+		return;
+	}
+});
+
+            fetch("https://webservices.ingv.it/fdsnws/event/1/query?starttime=2023-09-01&format=geojson")
+            .then(response => response.json())
+            .then(data => {
+
+                
+                var heat = L.heatLayer(geoJson2heat(data), {radius: function(a){console.log(a)}}).addTo(map);
+
+                var options = {
+    radius : 12,
+    opacity: 0.5,
+    duration: 500
+};
+
+/*
+
+	.radiusValue(function (d) {
+		return d.length;
+	})
+	.colorValue(function (d, i) {
+		var hexsum = d.reduce(function (acc, obj) { return acc + obj["o"][2]; }, 0);
+		console.log(hexsum)
+		return hexsum
+	})
+    */
+
+                var hexLayer = L.hexbinLayer(options).addTo(map)
+hexLayer.colorScale().range(['white', 'blue']);
+
+hexLayer
+  .radiusRange([6, 11])
+	.lng(function(d) { return d[0]; })
+  .lat(function(d) { return d[1]; })
+  .colorValue(function(d) { return d.length; })
+  .radiusValue(function(d) { return d.length; });
+
+var latFn = d3.randomNormal(latitude, 1);
+var longFn = d3.randomNormal(longitude, 1);
+
+var generateData = function(){
+    var data = [];
+    for(i=0; i<1000; i++){
+        data.push([longFn(),  latFn()]);
+    }
+    hexLayer.data(data);
+};
+
+generateData();
+    
+
+
+    
+                // data.features.forEach(function(feature) {
+                //     var marker = L.marker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]).addTo(map);
+                //     marker.bindPopup(feature.properties.title);
+                // });
+
+                // let layer = L.geoJSON().addTo(map);
+                // layer.addData(data, {
+                //     style: myStyle
+                // });
+
+                
+
+
+            });
 
 
             
         }
 
-        fetch("/auth", {method: "POST", data: JSON.stringify({"auth-key": "???"})})
-        .then()
+        // fetch("/auth", {method: "POST", data: JSON.stringify({"auth-key": "???"})})
+        // .then()
         navigator.geolocation.getCurrentPosition(showPosition);
 
 
