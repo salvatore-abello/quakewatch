@@ -36,17 +36,62 @@
             </li>
         </ul>
     </nav>
-    <div class="fixed-geo-menu">
-            <div class="dropdown h-100">
-                <button class="btn btn-primary dropdown-toggle h-100" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    Maps
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <li><a class="dropdown-item" href="#">Default</a></li>
-                    <li><a class="dropdown-item" href="#">Heatmap</a></li>
-                    <li><a class="dropdown-item" href="#">Hexbin</a></li>
-                </ul>
+    <div class="fixed-bottom-right-geo-menu disable-selection">
+        <div class="dropdown h-100">
+            <div class="container d-flex flex-column justify-content-end h-100" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                <b class="mb-2 text-light">Maps</b>
             </div>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li><a class="dropdown-item" href="#">Default</a></li>
+                <li><a class="dropdown-item" href="#">Heatmap</a></li>
+                <li><a class="dropdown-item" href="#">Hexbin</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="fixed-bottom-left-geo-menu">
+        <div class="container">
+            <h5>Earthquake magnitudes</h5>
+            <div class="row">
+                <div class="col">
+                    <div style="display: flex; align-items: center;">
+                        <i style="height:20px; width:20px; background: #000000"></i>
+                        <span style="margin-left: 5px;"><b>7 or greater</b></span>
+                    </div>
+                </div>
+            </div>    
+            <div class="row">
+                <div class="col">
+                    <div style="display: flex; align-items: center;">
+                        <i style="height:20px; width:20px; background: #750098"></i>
+                        <span style="margin-left: 5px;"><b>6 - 6.9</b></span>
+                    </div>
+                </div>  
+            </div>   
+            <div class="row">
+                <div class="col">
+                    <div style="display: flex; align-items: center;">
+                        <i style="height:20px; width:20px; background: #ff2525"></i>
+                        <span style="margin-left: 5px;"><b>5 - 5.9</b></span>
+                    </div>
+                </div>  
+            </div> 
+            <div class="row">
+                <div class="col">
+                    <div style="display: flex; align-items: center;">
+                        <i style="height:20px; width:20px; background: #ff7723"></i>
+                        <span style="margin-left: 5px;"><b>4 - 4.9</b></span>
+                    </div>
+                </div>  
+            </div> 
+            <div class="row">
+                <div class="col">
+                    <div style="display: flex; align-items: center;">
+                        <i style="height:20px; width:20px; background: #ffffff"></i>
+                        <span style="margin-left: 5px;"><b>&lt;4</b></span>
+                    </div>
+                </div>  
+            </div> 
+        </div>
     </div>
     
 
