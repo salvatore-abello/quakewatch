@@ -1,0 +1,15 @@
+.fixed-geo-menu {
+    position: fixed; 
+    bottom: 0; 
+    right: 0; 
+    height: 2.75rem; 
+    width: 25rem;
+    background-color: rgb(230, 230, 230);
+    margin-bottom: 2rem;
+    margin-left: auto;
+    margin-right: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border-radius: 10px; /* Adjust the value to change the smoothness of the border */
+    z-index: 1000; /* Make sure the menu is on top of the map */
+    padding: 0;
+}

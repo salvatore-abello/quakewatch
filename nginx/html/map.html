@@ -5,9 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/map-style.css">
     <style> #map { height: 100vh; } </style>
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-4 fixed-top">
+        <a class="navbar-brand" href="#">
+            <img src="/images/logo.png" width="48" class="d-inline-block align-top" alt="">
+            
+          </a>
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+            <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="/register">Register</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="/search">Search</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="/post">Create post</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="/report">Report</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="fixed-geo-menu">
+            <div class="dropdown h-100">
+                <button class="btn btn-primary dropdown-toggle h-100" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    Maps
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <li><a class="dropdown-item" href="#">Default</a></li>
+                    <li><a class="dropdown-item" href="#">Heatmap</a></li>
+                    <li><a class="dropdown-item" href="#">Hexbin</a></li>
+                </ul>
+            </div>
+    </div>
+    
+
     <div id="map"></div>
     
     <script src="/js/simpleheat.js"></script>
@@ -15,7 +57,7 @@
     <script src="https://www.unpkg.com/leaflet.heat@0.2.0/src/HeatLayer.js"></script>
     <script src="https://unpkg.com/pouchdb@^5.2.0/dist/pouchdb.js"></script>
 	<script src="https://unpkg.com/leaflet.tilelayer.pouchdbcached@latest/L.TileLayer.PouchDBCached.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
     <script src="https://d3js.org/d3-hexbin.v0.2.min.js"></script>
     <script src="https://unpkg.com/@asymmetrik/leaflet-d3@4/dist/leaflet-d3.js" charset="utf-8"></script>
@@ -25,113 +67,104 @@
         let latitude;
         let longitude;
         let map;
+        let data;
 
-        geoJson2heat = function(geojson) {
-return geojson.features.map(function(feature) {
-return [parseFloat(feature.geometry.coordinates[1]), 
-        parseFloat(feature.geometry.coordinates[0]), feature.properties.mag]//;
-});
-}
+        function earthquakeRange(magnitude, latitude) {
+            const radiusKm = (Math.exp(magnitude/1.01-0.13))*1000; // Radius in kilometers
+            const rangeKm = radiusKm * 2; // Assuming circular area
+
+            return rangeKm;
+        }
+
+        function geoJson2heat(geojson) {
+            return geojson.features.map(function(feature) {
+                return [parseFloat(feature.geometry.coordinates[1]), parseFloat(feature.geometry.coordinates[0]), feature.properties.mag];
+            });
+        }
+
+        function geoJson2hexbin(geojson) {
+            return geojson.features.map(function(feature) {
+                return [parseFloat(feature.geometry.coordinates[0]), parseFloat(feature.geometry.coordinates[1]), feature.properties.mag];
+            });
+        }
 
         function showPosition(position) {
             latitude = position.coords.latitude;
             longitude = position.coords.longitude;
-
             console.log(latitude + " " + longitude);
-
             main()
         }
 
+        function loadHeatMap(){
+            var heat = L.heatLayer(geoJson2heat(data), {radius: 50}).addTo(map);
+        }
+
+        function loadHexbinMap(){
+
+            var options = { radius : 12, opacity: 0.5, duration: 500 };
+
+            var hexLayer = L.hexbinLayer(options).addTo(map)
+            hexLayer.colorScale().range(['white', 'orange', 'red', 'purple', 'black']);
+            hexLayer
+            .radiusRange(function(d) {return earthquakeRange(d[0].o[2], d[1])})
+            .lng(function(d) { return d[0]; })
+            .lat(function(d) { return d[1]; })
+            .radiusValue(function (d) {
+                return earthquakeRange(d[0].o[2], d[1]);
+            })
+            .colorValue(function (d, i) {
+                var hexsum = d.reduce(function (acc, obj) { return obj["o"][2]; }, 0);
+                return hexsum
+            })
+
+            hexLayer.data(geoJson2hexbin(data));
+        }
+
         function main(){
-            map = L.map('map', {    reuseTiles: true, 
-    unloadInvisibleTiles: true}).setView([latitude, longitude], 8);
+            map = L.map('map').setView([latitude, longitude], 8);
 
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
                 useCache: true,
-	crossOrigin: true
+	            crossOrigin: true
             }).addTo(map);
             
-            L.Control.Layers.include({
-	_checkDisabledLayers: function (){
-		return;
-	}
-});
+            L.Control.Layers.include({_checkDisabledLayers: function (){}});
 
             fetch("https://webservices.ingv.it/fdsnws/event/1/query?starttime=2023-09-01&format=geojson")
             .then(response => response.json())
-            .then(data => {
-
-                
-                var heat = L.heatLayer(geoJson2heat(data), {radius: function(a){console.log(a)}}).addTo(map);
-
-                var options = {
-    radius : 12,
-    opacity: 0.5,
-    duration: 500
-};
-
-/*
-
-	.radiusValue(function (d) {
-		return d.length;
-	})
-	.colorValue(function (d, i) {
-		var hexsum = d.reduce(function (acc, obj) { return acc + obj["o"][2]; }, 0);
-		console.log(hexsum)
-		return hexsum
-	})
-    */
-
-                var hexLayer = L.hexbinLayer(options).addTo(map)
-hexLayer.colorScale().range(['white', 'blue']);
-
-hexLayer
-  .radiusRange([6, 11])
-	.lng(function(d) { return d[0]; })
-  .lat(function(d) { return d[1]; })
-  .colorValue(function(d) { return d.length; })
-  .radiusValue(function(d) { return d.length; });
-
-var latFn = d3.randomNormal(latitude, 1);
-var longFn = d3.randomNormal(longitude, 1);
-
-var generateData = function(){
-    var data = [];
-    for(i=0; i<1000; i++){
-        data.push([longFn(),  latFn()]);
-    }
-    hexLayer.data(data);
-};
-
-generateData();
-    
-
-
-    
-                // data.features.forEach(function(feature) {
-                //     var marker = L.marker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]).addTo(map);
-                //     marker.bindPopup(feature.properties.title);
-                // });
-
-                // let layer = L.geoJSON().addTo(map);
-                // layer.addData(data, {
-                //     style: myStyle
-                // });
-
-                
-
-
+            .then(geodata => {
+                data = geodata;
+                // loadHeatMap();
+                loadHexbinMap();
             });
-
-
-            
         }
 
         // fetch("/auth", {method: "POST", data: JSON.stringify({"auth-key": "???"})})
         // .then()
         navigator.geolocation.getCurrentPosition(showPosition);
+
+// var generateData = function(){
+//     var data = [];
+//     for(i=0; i<1000; i++){
+//         data.push([longFn(),  latFn()]);
+//     }
+//     hexLayer.data(data);
+// };
+
+// generateData();
+// data.features.forEach(function(feature) {
+//     var marker = L.marker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]).addTo(map);
+//     marker.bindPopup(feature.properties.title);
+// });
+
+// let layer = L.geoJSON().addTo(map);
+// layer.addData(data, {
+//     style: myStyle
+// });
+
+                
 
 
                 
