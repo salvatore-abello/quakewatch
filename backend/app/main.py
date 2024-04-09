@@ -10,7 +10,7 @@ from slowapi.errors import RateLimitExceeded
 from .constants import DEFAULT_JWT_SECRET_KEY, LIMITS
 from .utils import setup_logging
 from .database import engine, SessionLocal
-from .routers import query, auth, limiter
+from .routers import query, auth, files, limiter
 from . import models
 
 models.Base.metadata.create_all(bind=engine)
@@ -60,4 +60,5 @@ def populate_database():
 
 app.include_router(query.router)
 app.include_router(auth.router)
+app.include_router(files.router)
 app.state.limiter = limiter

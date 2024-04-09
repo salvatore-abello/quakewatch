@@ -115,8 +115,8 @@
 
     <script>
         const dropdownItems = document.querySelectorAll('.dropdown-item');
-        const DEFAULT_SETTINGS = {
-            "": 2
+        const DEFAULT_SETTINGS = { // TODO
+            "map": "hexbin"
         };
 
         let latitude;
@@ -196,6 +196,8 @@
             let conv = geoJson2data(data);
             hexLayer.data(conv);
             hexLayer.addTo(map);
+
+            
         }
 
         function loadHexbinMap(){
@@ -233,7 +235,7 @@
             }
         }
 
-        function clearHeatLayer(){ // Should we remove also circles?
+        function clearHeatLayer(){
             map.eachLayer(function (layer) {
             if (layer instanceof L.HeatLayer) {
                 map.removeLayer(layer);

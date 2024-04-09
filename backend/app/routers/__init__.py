@@ -14,7 +14,7 @@ limiter = Limiter(
     strategy="fixed-window"
 )
 
-def query_plan_based_rate_limiter(f): # return await limiter.limit(LIMITS[plan_type])(f)(*args, **kwargs)
+def plan_based_rate_limiter(f): # return await limiter.limit(LIMITS[plan_type])(f)(*args, **kwargs)
     """
     A decorator that applies rate limiting based on the plan type specified in the JWT claims.
     This decorator should be applied only to query endpoints (eg. /query/earthquake)
