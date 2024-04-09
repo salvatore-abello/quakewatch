@@ -17,7 +17,7 @@
           </a>
         <ul class="navbar-nav">
             <li class="nav-item active">
-            <a class="nav-link" href="/">Home</a>
+                <a class="nav-link" href="/">Home</a>
             </li>
             <li class="nav-item">
             <a class="nav-link" href="/register">Register</a>
@@ -43,14 +43,14 @@
                 <b class="mb-2 text-light">Maps</b>
             </div>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <li><a class="dropdown-item" href="#">Default</a></li>
-                <li><a class="dropdown-item" href="#">Heatmap</a></li>
-                <li><a class="dropdown-item" href="#">Hexbin</a></li>
+                <li><a class="dropdown-item" href="#" data-value="none">Clear</a></li>
+                <li><a class="dropdown-item" href="#" data-value="heatmap">Heatmap</a></li>
+                <li><a class="dropdown-item" href="#" data-value="hexbin">Hexbin</a></li>
             </ul>
         </div>
     </div>
     
-    <div class="fixed-bottom-left-geo-menu">
+    <div class="fixed-bottom-left-geo-menu disable-selection">
         <div class="container">
             <h5>Earthquake magnitudes</h5>
             <div class="row">
@@ -88,11 +88,15 @@
             <div class="row">
                 <div class="col">
                     <div style="display: flex; align-items: center;">
-                        <i style="height:20px; width:20px; background: #ffffff"></i>
-                        <span style="margin-left: 5px;"><b>&lt;3</b></span>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                            <label class="form-check-label" for="flexCheckDefault">
+                              Disable points
+                            </label>
+                          </div>
                     </div>
-                </div>  
-            </div> 
+                </div>
+            </div>
         </div>
     </div>
     
@@ -110,87 +114,108 @@
     <script src="https://unpkg.com/@asymmetrik/leaflet-d3@4/dist/leaflet-d3.js" charset="utf-8"></script>
 
     <script>
+        const dropdownItems = document.querySelectorAll('.dropdown-item');
+        const DEFAULT_SETTINGS = {
+            "": 2
+        };
 
         let latitude;
         let longitude;
         let map;
         let data;
+        let settings;
 
-        function earthquakeRange(magnitude, latitude) {
-            const richterScaleDistance = 10; // This value can vary based on different sources and studies
+        let hexLayer;
+        let heatLayer;
 
-            // Calculate the range using the Richter scale distance method
-            // Formula: Range = 10^(0.5 * (magnitude + 1.6))
-            const range = Math.pow(10, 0.5 * (magnitude + 1.6));
-
-            // Return the calculated range
-            return range;
+        function loadSettings(){
+            settings = JSON.parse(localStorage.getItem("settings") || DEFAULT_SETTINGS)
         }
 
-        function geoJson2heat(geojson) {
+        function geoJson2data(geojson) {
             return geojson.features.map(function(feature) {
                 return [parseFloat(feature.geometry.coordinates[1]), parseFloat(feature.geometry.coordinates[0]), feature.properties.mag];
             });
         }
 
-        function geoJson2hexbin(geojson) {
-            return geojson.features.map(function(feature) {
-                return [parseFloat(feature.geometry.coordinates[0]), parseFloat(feature.geometry.coordinates[1]), feature.properties.mag];
+        function loadCoordsAndExecuteMain(position) {
+            latitude = position.coords.latitude;
+            longitude = position.coords.longitude;
+
+            main();
+        }
+
+        function clearMarkers(){
+            map.eachLayer(function (layer) {
+                if (layer instanceof L.Circle) {
+                    map.removeLayer(layer);
+                }
             });
         }
 
-        function showPosition(position) {
-            latitude = position.coords.latitude;
-            longitude = position.coords.longitude;
-            console.log(latitude + " " + longitude);
-            main()
+        function loadEarthquakeMarkers(){
+            clearMarkers();
+            data.features.forEach(function(feature) {
+                let point = feature.geometry.coordinates;
+                let mag = feature.properties.mag;
+                if (mag > 3) { // Remove all points with magnitude less than 4, there are too many of them
+                    let color = mag > 6 ? '#000000' : mag > 5 ? '#750098' : mag > 4 ? '#ff2525' : '#ff7723';
+                    let circle = L.circle([point[1], point[0]], {
+                        color: color,
+                        fillColor: color,
+                        fillOpacity: 0.5,
+                        radius: mag*1000
+                    })
+                    map.addLayer(circle);
+                    
+                    circle.bindPopup(`
+                        <b>Latitude:</b> ${point[1]}
+                        </br>
+                        <b>Longitude:</b> ${point[0]}
+                        </br>
+                        <b>Magnitude:</b> ${mag}
+                        </br>
+                        <b>Time:</b> ${new Date(feature.properties.time).toLocaleString()}
+                    `);
+                }
+            });
         }
 
-        function loadHeatMap(){
-            var heat = L.heatLayer(geoJson2heat(data), {radius: 50}).addTo(map);
+        function setupHexLayer(){
+            hexLayer = L.hexbinLayer({ radius : 12, opacity: 0.5, duration: 500 })
+            hexLayer.colorScale().domain([ 1,500 ]);
+            hexLayer.colorScaleExtent([ 1,500 ]);
+            hexLayer
+                .radiusRange(function(d) {return d.length})
+                .lng(function(d) { return d[1]; })
+                .lat(function(d) { return d[0]; })
+                .radiusValue(function (d) {
+                    return d.length;
+            });
+
+            let conv = geoJson2data(data);
+            hexLayer.data(conv);
+            hexLayer.addTo(map);
         }
 
         function loadHexbinMap(){
-
-            var options = { radius : 12, opacity: 0.5, duration: 500 };
-
-            var hexLayer = L.hexbinLayer(options).addTo(map)
-            //hexLayer.scaleLinear()
-            hexLayer.colorScale().domain([ 1,500 ]).range(['white', 'orange', 'red', 'purple', 'black']);
-            hexLayer.colorScaleExtent([ 1,500 ]);
-            hexLayer
-            .radiusRange(function(d) {return earthquakeRange(d[0].o[2], d[1])})
-            .lng(function(d) { return d[0]; })
-            .lat(function(d) { return d[1]; })
-            .radiusValue(function (d) {
-                return earthquakeRange(d[0].o[2], d[1]);
-            })
-            // .colorValue(function (d, i) {
-            //     var hexsum = d.reduce(function (acc, obj) { return obj["o"][2]; }, 0);
-            //     return hexsum
-            // })
-
-            let conv = geoJson2hexbin(data)//.filter(item => item[2] < 4);
-
-            
-
-            conv.forEach(function(point) {
-                if (point[2] > 4) {
-                    var circle = L.circle([point[1], point[0]], {
-                        color: 'red',
-                        fillColor: '#f03',
-                        fillOpacity: 0.5,
-                        radius: point[2]*1000
-                    }).addTo(map);
-                }
-            });
-
-            hexLayer.data(conv);
+            hexLayer.options.opacity = 0.5;
+            hexLayer.redraw();
+            clearHeatLayer();
         }
 
-        function main(){
+        function loadHeatMap(){
+            disableHexbinLayer();
+            if (!heatLayer || !map.hasLayer(heatLayer)) {
+                heatLayer = L.heatLayer(geoJson2data(data), {radius: 50}).addTo(map);                
+            }
+            
+        }
+
+        function loadMap(){
             map = L.map('map').setView([latitude, longitude], 8);
 
+            // https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -199,45 +224,65 @@
             }).addTo(map);
             
             L.Control.Layers.include({_checkDisabledLayers: function (){}});
+        }
+
+        function disableHexbinLayer(){
+            if (hexLayer && map.hasLayer(hexLayer)) {
+                hexLayer.options.opacity = 0;
+                hexLayer.redraw();
+            }
+        }
+
+        function clearHeatLayer(){ // Should we remove also circles?
+            map.eachLayer(function (layer) {
+            if (layer instanceof L.HeatLayer) {
+                map.removeLayer(layer);
+            }});
+        }
+
+        function clearMap(){
+            clearHeatLayer();
+            disableHexbinLayer();
+        }
+
+        function main(){
+            loadMap();
 
             fetch("https://webservices.ingv.it/fdsnws/event/1/query?starttime=2023-09-01&format=geojson")
             .then(response => response.json())
             .then(geodata => {
                 data = geodata;
-                // loadHeatMap();
+                setupHexLayer();
                 loadHexbinMap();
+                loadEarthquakeMarkers();
             });
         }
 
-        // fetch("/auth", {method: "POST", data: JSON.stringify({"auth-key": "???"})})
-        // .then()
-        navigator.geolocation.getCurrentPosition(showPosition);
+        flexCheckDefault.addEventListener('change', (event) => {
+            if (event.target.checked) {
+                map.eachLayer(function (layer) {
+                    if (layer instanceof L.Circle) {
+                        map.removeLayer(layer);
+                    }
+                });
+            } else {
+                loadEarthquakeMarkers(data);
+            }
+        });
 
-// var generateData = function(){
-//     var data = [];
-//     for(i=0; i<1000; i++){
-//         data.push([longFn(),  latFn()]);
-//     }
-//     hexLayer.data(data);
-// };
+        dropdownMenuButton.addEventListener('click', (event) => {
+            console.log(event.target);
+        });
 
-// generateData();
-// data.features.forEach(function(feature) {
-//     var marker = L.marker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]).addTo(map);
-//     marker.bindPopup(feature.properties.title);
-// });
-
-// let layer = L.geoJSON().addTo(map);
-// layer.addData(data, {
-//     style: myStyle
-// });
-
-                
-
-
-                
         
+        dropdownItems.forEach(function(item) {
+            item.addEventListener('click', function(event) {
+                event.preventDefault(); 
+                let ret = {none: clearMap, hexbin: loadHexbinMap, heatmap: loadHeatMap}[this.dataset.value]();
+            });
+        });
 
+        navigator.geolocation.getCurrentPosition(loadCoordsAndExecuteMain);
     </script>
 </body>
 </html>
