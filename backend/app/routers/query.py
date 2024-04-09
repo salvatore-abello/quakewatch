@@ -13,6 +13,6 @@ router = APIRouter(prefix="/query")
 async def handle_request(query_type: str, request: Request, response: Response, Authorize: AuthJWT = Depends()):
     return {"data": await middleware.dispatch(query_type, utils.hashabledict(request.query_params))}
 
-@router.get("/history/{query_type}")
+@router.get("/history/{query_type}") # CHANGE THIS FUNCTION NAME
 async def handle_request(query_type: str, request: Request, response: Response):
     return {"data": await middleware.get_earthquake_history(utils.hashabledict(request.query_params))}

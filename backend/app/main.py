@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
     populate_database()
     yield
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, root_path="/api")
 logger = setup_logging()
 
 class Settings(BaseModel):

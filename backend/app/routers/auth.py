@@ -10,7 +10,6 @@ from ..utils import get_db
 
 router = APIRouter(prefix="/auth")
 
-
 @router.post("/")
 async def handle_key_auth(request: Request, Authorize: AuthJWT = Depends(), 
                       db: Session = Depends(get_db)):
