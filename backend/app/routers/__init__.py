@@ -6,6 +6,9 @@ from slowapi.util import get_remote_address
 from fastapi_another_jwt_auth import AuthJWT
 from fastapi import Depends
 from sqlalchemy.orm import Session
+from fastapi import Request
+from fastapi_another_jwt_auth.exceptions import AuthJWTException
+import jwt
 
 from .. import constants as CONSTANTS
 from .. import crud
@@ -24,40 +27,31 @@ def plan_based_rate_limiter(f): # return await limiter.limit(LIMITS[plan_type])(
     This decorator should be applied only to query endpoints (eg. /query/earthquake)
     """
     @functools.wraps(f)
-    async def wrapper(*args, **kwargs):
-        Authorize = kwargs["Authorize"]
-        Authorize.jwt_required()
-        
-        plan_type = Authorize.get_raw_jwt()["plan_type"]
-        
-        @limiter.limit(CONSTANTS.LIMITS[plan_type], key_func=Authorize.get_jwt_subject)
-        @functools.wraps(f)
-        async def todecorate(*args, **kwargs):
-            return await f(*args, **kwargs)
-        return await todecorate(*args, **kwargs)
-
-    return wrapper
-
-def login_required(f):
-    @functools.wraps(f)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(request: Request, *args, **kwargs):
         db = next(get_db())
-        logger = setup_logging()
+        key = request.query_params.get("key")
 
-        Authorize = kwargs["Authorize"]
+        db_key = crud.get_key_from_value(db, key)
+        if not db_key:
+            raise ValueError("Invalid key")
 
-        logger.warning(f"{args}")
-        logger.warning(f"{args[0].cookies}")
+        @limiter.limit(CONSTANTS.LIMITS[db_key.plan], key_func=lambda: db_key.key)
+        @functools.wraps(f)
+        async def todecorate(request, *args, **kwargs):
+            return await f(request, *args, **kwargs)
+        return await todecorate(request, *args, **kwargs)
 
-        Authorize.jwt_required()
-
-        user_id = Authorize.get_jwt_subject()
-        
-        logger.warning(user_id)
-        logger.warning(f'{crud.get_user(db, user_id)}')
-
-        if not crud.get_user(db, user_id):
-            raise ValueError("Unauthorized")
-        
-        return await f(*args, **kwargs)
     return wrapper
+
+def get_current_user(request: Request, db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
+    db = next(get_db())
+    logger = setup_logging()
+
+    Authorize.jwt_required()
+
+    sub = Authorize.get_jwt_subject()
+
+    current_user = crud.get_user(db, sub)
+    if not current_user:
+        raise ValueError("Unauthorized")
+    return current_user

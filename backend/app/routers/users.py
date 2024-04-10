@@ -3,8 +3,11 @@ from fastapi import APIRouter, Request, Response, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from typing import Annotated
+from fastapi import Query
 
-from . import login_required
+
+from . import get_current_user
 from .. import crud, schemas
 from ..utils import get_db
 
@@ -12,11 +15,10 @@ from ..utils import get_db
 router = APIRouter(prefix="/users", tags=["users"])
 
 @router.get("/current", response_model=schemas.User)
-@login_required
-async def handle_register(request: Request, db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
+async def get_current_user(request: Request, db: Session = Depends(get_db), Authorize: AuthJWT = Depends(), 
+                           current_user=Depends(get_current_user)):
     """ Get current user data """
-    email = Authorize.get_jwt_subject()
-    return crud.get_user_by_email(db, email)
+    return current_user
     
 @router.post("/register", response_model=schemas.UserBase)
 async def handle_register(request: Request, user: schemas.UserCreate, 
@@ -34,7 +36,8 @@ async def handle_login(request: Request, user: schemas.UserLogin,
         access_token = Authorize.create_access_token(subject=user.IDUser)
         json_response = JSONResponse(content={"msg": "Successfully logged in"})
         
-        json_response.set_cookie(key="session",value=access_token)
+        Authorize.set_access_cookies(access_token, json_response)
+        
         return json_response
     
     return JSONResponse(content={"msg": "Invalid credentials"}, status_code=401)

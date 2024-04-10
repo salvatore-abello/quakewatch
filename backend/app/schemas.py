@@ -25,19 +25,20 @@ class User(UserBase):
         orm_mode = True
 
 class PlanBase(BaseModel):
-    type: str
+    IDPlan: int
 
 class Plan(PlanBase):
-    IDPlan: int
+    type: str
 
 class KeyBase(BaseModel):
     key: str
 
 class KeyCreate(KeyBase):
-    pass
+    plan: PlanBase
+    user: User
 
 class KeyPurchaseRequest(BaseModel):
-    plan: Plan
+    plan: PlanBase
 
     class Config:
         orm_mode = True

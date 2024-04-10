@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 
 from .database import Base
@@ -29,6 +29,7 @@ class Key(Base):
 
     IDKey = Column(Integer, primary_key=True)
     key = Column(String(36), unique=True, index=True)
+    expiration_date = Column(DateTime)  # Add the expiration date column
 
     CODPlan = Column(Integer, ForeignKey("Plans.IDPlan"))
     CODUser = Column(Integer, ForeignKey("Users.IDUser"))
