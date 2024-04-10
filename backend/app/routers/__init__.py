@@ -4,8 +4,12 @@ import functools
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from fastapi_another_jwt_auth import AuthJWT
+from fastapi import Depends
+from sqlalchemy.orm import Session
 
 from .. import constants as CONSTANTS
+from .. import crud
+from ..utils import get_db, setup_logging
 
 limiter = Limiter(
     key_func=get_remote_address,
@@ -37,8 +41,23 @@ def plan_based_rate_limiter(f): # return await limiter.limit(LIMITS[plan_type])(
 def login_required(f):
     @functools.wraps(f)
     async def wrapper(*args, **kwargs):
+        db = next(get_db())
+        logger = setup_logging()
+
         Authorize = kwargs["Authorize"]
+
+        logger.warning(f"{args}")
+        logger.warning(f"{args[0].cookies}")
+
         Authorize.jwt_required()
 
+        user_id = Authorize.get_jwt_subject()
+        
+        logger.warning(user_id)
+        logger.warning(f'{crud.get_user(db, user_id)}')
+
+        if not crud.get_user(db, user_id):
+            raise ValueError("Unauthorized")
+        
         return await f(*args, **kwargs)
     return wrapper

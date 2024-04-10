@@ -6,7 +6,7 @@ from fastapi import APIRouter, Request, Response, Depends
 from .. import constants
 
 
-router = APIRouter(prefix="/files")
+router = APIRouter(prefix="/files", tags=["files"])
 
 # USE ONLY HARDCODED FILENAMES
 # DO NOT USE USER INPUT !!!!!!

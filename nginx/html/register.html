@@ -54,29 +54,27 @@
         <div class="row">
             <div class="col-md-6 offset-md-3">
                 <h1 class="mb-3">Register</h1>
-                <form action="/login" method="POST" class="my-3">
-                    <div class="input-group form-outline mb-3" data-mdb-input-init>
-                        <input type="text" class="form-control" id="name" name="name" required />
-                        <label for="name" class="form-label">Name</label>
-                    </div>
-                    <div class="input-group form-outline mb-3" data-mdb-input-init>
-                        <input type="text" class="form-control" id="surname" name="surname" required />
-                        <label for="surname" class="form-label">Surname</label>
-                    </div>
-                    <div class="input-group form-outline mb-3" data-mdb-input-init>
-                        <span class="input-group-text" id="inputGroupPrepend">📧</span>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="example.com" required />
-                        <label for="email" class="form-label">e-mail</label>
-                    </div>
-                    <div class="input-group form-outline mb-3" data-mdb-input-init>
-                        <span class="input-group-text" id="inputGroupPrepend">🔐</span>
-                        <input type="password" class="form-control" id="password" name="password" required />
-                        <label for="password" class="form-label">password</label>
-                    </div>
+                <div class="input-group form-outline mb-3" data-mdb-input-init>
+                    <input type="text" class="form-control" id="name" name="name" required />
+                    <label for="name" class="form-label">Name</label>
+                </div>
+                <div class="input-group form-outline mb-3" data-mdb-input-init>
+                    <input type="text" class="form-control" id="surname" name="surname" required />
+                    <label for="surname" class="form-label">Surname</label>
+                </div>
+                <div class="input-group form-outline mb-3" data-mdb-input-init>
+                    <span class="input-group-text" id="inputGroupPrepend">📧</span>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="example.com" required />
+                    <label for="email" class="form-label">e-mail</label>
+                </div>
+                <div class="input-group form-outline mb-3" data-mdb-input-init>
+                    <span class="input-group-text" id="inputGroupPrepend">🔐</span>
+                    <input type="password" class="form-control" id="password" name="password" required />
+                    <label for="password" class="form-label">password</label>
+                </div>
 
-                    <button type="submit" class="btn btn-primary">Register</button>
+                <button type="submit" class="btn btn-primary">Register</button>
 
-                </form>
                 <p>Already registered? <a href="/login">Click here</a></p>
                 <div class="h-captcha" id="h-captcha-widget" data-sitekey="fdcb9368-2cf0-45e6-8f0d-53ad84a7cf00"></div>
             </div>

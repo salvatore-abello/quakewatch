@@ -7,10 +7,10 @@ from fastapi_another_jwt_auth import AuthJWT
 from fastapi_another_jwt_auth.exceptions import AuthJWTException
 from slowapi.errors import RateLimitExceeded
 
-from .constants import DEFAULT_JWT_SECRET_KEY, LIMITS
+from .constants import DEFAULT_JWT_SECRET_KEY, LIMITS, OPENAPI_TAGS
 from .utils import setup_logging
 from .database import engine, SessionLocal
-from .routers import query, auth, files, limiter
+from .routers import query, files, users, keys, limiter
 from . import models
 
 models.Base.metadata.create_all(bind=engine)
@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
     populate_database()
     yield
 
-app = FastAPI(lifespan=lifespan, root_path="/api")
+app = FastAPI(lifespan=lifespan, root_path="/api", openapi_tags=OPENAPI_TAGS)
 logger = setup_logging()
 
 class Settings(BaseModel):
@@ -48,17 +48,17 @@ def get_config():
     return Settings()
 
 def populate_database():
-    # db = SessionLocal()
-    # if not db.query(models.Plan).first():
-    #     default_plans = [{"type": x} for x in LIMITS]
-    #     for plan in default_plans:
-    #         plan = models.Plan(**plan)
-    #         db.add(plan)
-    #     db.commit()
-    # db.close()
-    pass
-
+    db = SessionLocal()
+    if not db.query(models.Plan).first():
+        default_plans = [{"type": x} for x in LIMITS]
+        for plan in default_plans:
+            plan = models.Plan(**plan)
+            db.add(plan)
+        db.commit()
+    db.close()
+    
 app.include_router(query.router)
-app.include_router(auth.router)
 app.include_router(files.router)
+app.include_router(users.router)
+app.include_router(keys.router)
 app.state.limiter = limiter

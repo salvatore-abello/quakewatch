@@ -23,7 +23,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-4">
         <a class="navbar-brand" href="#">
             <img src="/images/logo.png" width="48" class="d-inline-block align-top" alt="">
-        </a>
+            
+          </a>
         <ul class="navbar-nav">
             <li class="nav-item active">
             <a class="nav-link" href="/">Home</a>
@@ -46,32 +47,47 @@
         </ul>
     </nav>
 
-    <div class="container w-50 mt-5">
-        <div class="row">
-            <div class="col-md-6 offset-md-3">
-                <h1 class="mb-3">Forgot password</h1>
-                <p>You will receive an email in order to reset your password</p>
-                <div class="input-group form-outline mb-3" data-mdb-input-init>
-                    <span class="input-group-text" id="inputGroupPrepend">📧</span>
-                    <input type="text" class="form-control" id="email" name="email" placeholder="example.com" required />
-                    <label for="email" class="form-label">e-mail</label>
+    <div class="container w-75">
+        <div class="card p-5">
+            <div class="card-body">
+                <h1 class="card-title mb-3" id="dgreet"></h1>
+                <hr class="hr">
+                <div class="row">
+                    <div class="col">
+                        <p id="dplan">You have an active plan</p>
+                    </div>
+                    <div class="col" id="plan-div">
+                        <p>Plan: <span class="text-primary">Basic</span></p>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar" id="req-progress-bar" role="progressbar" style="width: 25%;" aria-valuemin="0" aria-valuemax="100">0%</div>
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary" id="login-btn">Send email</button>
+
             </div>
+
         </div>
+        
     </div>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
-    $("#login-btn").click(() => {
-        let email = $("#email").val();
-        let password = $("#password").val();
 
-        fetch("/api/auth", {method: "POST", data: JSON.stringify({"email": email, "password": password})})
-        .then();
-    })
+function loadDashboardData(){
+    fetch("/api/users/current")
+    .then(response => response.json())
+    .then(
+        data => {
+            console.log(data);
+            dgreet.innerText = `Hello, ${data.name}`;
+            dplan.innerHTML = data.key ? "You have an active plan" : `You don't have an active plan yet. <a href="/plans">Click here</a> to subscribe to a plan`;
+        }
+    )
+}
+
+loadDashboardData();
 </script>
 </body>
 </html>

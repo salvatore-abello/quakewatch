@@ -1,11 +1,14 @@
 from pydantic import BaseModel
 from typing import Optional
-
+from datetime import datetime
 
 class UserBase(BaseModel):
     name: str
     surname: str
     email: str
+
+    class Config:
+        orm_mode = True
 
 class UserCreate(UserBase):
     password: str
@@ -16,12 +19,13 @@ class UserLogin(BaseModel):
 
 class User(UserBase):
     IDUser: int
+    key: Optional["Key"]
 
     class Config:
         orm_mode = True
 
 class PlanBase(BaseModel):
-    type: int
+    type: str
 
 class Plan(PlanBase):
     IDPlan: int
@@ -30,14 +34,18 @@ class KeyBase(BaseModel):
     key: str
 
 class KeyCreate(KeyBase):
-    user: User
+    pass
+
+class KeyPurchaseRequest(BaseModel):
     plan: Plan
+
     class Config:
         orm_mode = True
 
 class Key(KeyBase):
     IDKey: int
-    user: User
+    plan: Plan
+    expiration_date: datetime  # Add expiration_date field
 
     class Config:
         orm_mode = True
