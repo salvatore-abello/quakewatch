@@ -5,7 +5,7 @@
 + Use slowapi instead of Flask-Limter
 + Return number of remaining requests
 
-# To be completed
+# TODOs
 - Complete register.html
 - Complete map.html (use the actual API instead of an external one)
 - Fix navbars (add mobile support)
@@ -14,6 +14,7 @@
 - Add free/paid js map file
 - Improve OpenAPI/Swagger API documentation (https://stackoverflow.com/questions/68815761/how-to-customize-fastapi-request-body-documentation)
 - Remove useless files (`__pycache__`, etc...)
+- Remove useless import(s)
 - Improve backend/frontend source code
 - Production
     - Minimize js files
