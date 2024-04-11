@@ -1,25 +1,36 @@
 import time
+import random
 import requests
 import threading
 
 
-r = requests.post("http://127.0.0.1:8080/api/auth", json={"auth-key": "a6a5cefe-8bef-4041-9506-2f5321fe57a4", "plan": "__dict__"})
+def f(key, x):
+    global ks
 
-print(r)
-print(r.text)
-    
-access_token = r.json()["access_token"]
-auth_headers = {
-    "Authorization": f"Bearer {access_token}"
-}
+    #print("making req")
+    r = requests.get("http://localhost:8080/api/query/earthquake", params={
+        "key": key,
+        "starttime": "2024-04-11"
+    })
+    if r.ok:
+        ks[x] += 1
+    else:
+        print(r.text)
 
-def f():
-    r = requests.get("http://localhost:8080/api/query/earthquake?starttime=2024-01-27", headers=auth_headers)
-    print(r.text)
-    print(r.json())
+keys = [
+    "19efd87b-dd8a-4774-a3e4-b5e599c62b36",
+    "eef051b0-bb60-45de-aee3-e170579d30ed"
+]
 
-# for x in range(5):
+ks = [0, 0]
+for i in range(2):
+    for x in range(100):
+        key = keys[x % 2]
+        threading.Thread(target=lambda: f(key, x % 2), daemon=True).start()
 
-f()
+input("Waiting >>> ")
+print("Expected values")
+print(ks)
+input(">>> ")
 time.sleep(.2)
 

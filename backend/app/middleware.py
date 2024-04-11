@@ -4,7 +4,7 @@ from cachetools import TTLCache, cached
 from . import constants as CONSTANTS
 
 
-@cached(cache=TTLCache(maxsize=640*512, getsizeof=len, ttl=3 * 60), lock=Lock()) # TTL 3min
+#@cached(cache=TTLCache(maxsize=640*512, getsizeof=len, ttl=3 * 60), lock=Lock()) # TTL 3min
 def earthquake_query(data):
     data["format"] = "geojson"
     # TODO: Check if GET requests are enough
@@ -22,7 +22,7 @@ def get_earthquake_history():pass
 #     # 
 #     return {}
 
-async def dispatch(query_type: str, data):
+def dispatch(query_type: str, data):
     if not (func:=ALLOWED_QUERY_TYPES.get(query_type)):
         return {"status": False, "data": {"msg": f"Unknown query type {query_type!r}"}}
     return func(data)

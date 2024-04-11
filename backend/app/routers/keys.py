@@ -5,11 +5,13 @@ from sqlalchemy.orm import Session
 from uuid import uuid4
 
 from . import get_current_user
+from ..redis import get_requests_number_from_key
 from .. import crud
 from ..schemas import Key, KeyPurchaseRequest, KeyCreate, User
 from ..utils import get_db, setup_logging
 from .. import models
-from ..responses import ErrorResponse, KeyResponse
+from ..constants import LIMITS
+from ..responses import *
 
 
 router = APIRouter(prefix="/keys", tags=["keys"])
@@ -24,6 +26,13 @@ async def handle_key_purchase(request: Request, key: KeyPurchaseRequest, db: Ses
 
     res = crud.create_key(db, key.plan, current_user)
     return {"msg": "Key purchased successfully", "data": res}
+
+@router.get("/status", response_model=NReqResponse)
+async def handle_get_key_status(request: Request, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db),
+                                current_user: User = Depends(get_current_user)):
+    nreqs, percentage = get_requests_number_from_key(current_user.key) if current_user.key else (0, 0)
+    return {"msg": "ok", "requests": nreqs, "percentage": percentage}
+
 
 @router.delete("/delete", response_model=KeyResponse, responses={
     400: {"model": ErrorResponse, "description": "You do not have an active plan"}

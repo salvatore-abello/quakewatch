@@ -10,7 +10,7 @@ from slowapi.errors import RateLimitExceeded
 from .constants import DEFAULT_JWT_SECRET_KEY, LIMITS, OPENAPI_TAGS
 from .utils import setup_logging
 from .database import engine, SessionLocal
-from .routers import query, files, users, keys, limiter
+from .routers import query, files, users, keys
 from . import models
 
 models.Base.metadata.create_all(bind=engine)
@@ -61,4 +61,3 @@ app.include_router(query.router)
 app.include_router(files.router)
 app.include_router(users.router)
 app.include_router(keys.router)
-app.state.limiter = limiter
