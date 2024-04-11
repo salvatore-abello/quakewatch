@@ -11,7 +11,7 @@ router = APIRouter(prefix="/files", tags=["files"])
 # USE ONLY HARDCODED FILENAMES
 # DO NOT USE USER INPUT !!!!!!
 
-# TODO: Use Headers with the key instead of jwt via cookie
+# TODO: FIX THIS. USE QUERY PARAMETER IN ORDER TO GET THE FILE. MAKE A FUNCTION IF THIS IS TOO UGLY TO SEE
 @router.get("/map.js")
 async def handle_request(request: Request, response: Response, Authorize: AuthJWT = Depends()):
     try:
