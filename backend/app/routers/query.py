@@ -10,7 +10,7 @@ router = APIRouter(prefix="/query", tags=["query"])
 
 @router.get("/{query_type}")
 @plan_based_rate_limiter
-async def handle_request(query_type: str, request: Request, response: Response):
+async def handle_request(query_type: str, key: str, response: Response, request: Request):
     """ Retrieve API data """
     return {"data": await middleware.dispatch(query_type, utils.hashabledict(request.query_params))}
 

@@ -1,3 +1,8 @@
+import os
+
+REDIS_PORT = int(os.environ.get("REDIS_PORT", "6379"))
+REDIS_HOST = os.environ.get("REDIS_HOST", "redis")
+
 LOGGING_FMT = "%(asctime)s | %(levelname)8s | %(message)s"
 LOGGER_NAME = "main"
 DEFAULT_JWT_SECRET_KEY = "keytest"
@@ -16,10 +21,6 @@ OPENAPI_TAGS = [
     {
         "name": "keys",
         "description": "Manage keys.",
-    },
-    {
-        "name": "auth",
-        "description": "Operations with authentication. **Login**, **register** **logout** are here.",
     },
     {
         "name": "query",

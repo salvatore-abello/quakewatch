@@ -4,7 +4,7 @@ import functools
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from fastapi_another_jwt_auth import AuthJWT
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi import Request
 from fastapi_another_jwt_auth.exceptions import AuthJWTException
@@ -16,7 +16,7 @@ from ..utils import get_db, setup_logging
 
 limiter = Limiter(
     key_func=get_remote_address,
-    storage_uri="redis://redis:6379",
+    storage_uri=f"redis://{CONSTANTS.REDIS_HOST}:{CONSTANTS.REDIS_PORT}",
     storage_options={"socket_connect_timeout": 30},
     strategy="fixed-window"
 )
@@ -28,19 +28,24 @@ def plan_based_rate_limiter(f): # return await limiter.limit(LIMITS[plan_type])(
     This decorator should be applied only to query endpoints (eg. /query/earthquake)
     """
     @functools.wraps(f)
-    async def wrapper(request: Request, *args, **kwargs):
+    async def wrapper(*args, **kwargs):
         db = next(get_db())
-        key = request.query_params.get("key")
 
+        request = kwargs["request"]
+
+        key = request.query_params.get("key")
         db_key = crud.get_key_from_value(db, key)
         if not db_key:
-            raise ValueError("Invalid key")
+            raise HTTPException(status_code=400, detail="Invalid key")
 
-        @limiter.limit(CONSTANTS.LIMITS[db_key.plan], key_func=lambda: db_key.key)
-        @functools.wraps(f)
-        async def todecorate(request, *args, **kwargs):
-            return await f(request, *args, **kwargs)
-        return await todecorate(request, *args, **kwargs)
+        try:
+            @limiter.limit(CONSTANTS.LIMITS[db_key.plan.type], key_func=lambda: db_key.key)
+            @functools.wraps(f)
+            async def todecorate(*args, **kwargs):
+                return await f(*args, **kwargs)
+            return await todecorate(*args, **kwargs)
+        except KeyError:
+            raise HTTPException(status_code=400, detail="Invalid plan. Reported to the admin") # TODO: Add report
 
     return wrapper
 
