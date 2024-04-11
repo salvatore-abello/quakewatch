@@ -104,7 +104,7 @@ function loadDashboardData(){
                     dgreet.innerText = `Hello, ${data.name}`;
                     if(data.key){
                         document.querySelector("#unsubscribe-btn").hidden = false;
-                        dplan.innerHTML = "You have an active plan"
+                        dplan.innerHTML = "You have an active plan" // TODO: Remove useless newlines from the line below
                         let planHTML = `<div class="col">
                         <p>Plan: <span class="text-primary">${data.key.plan.type}</span></p>
                         <div class="progress" style="height: 20px;">
