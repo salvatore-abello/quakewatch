@@ -104,12 +104,12 @@ function loadDashboardData(){
             .then(
             keyStatus => {
                 console.log(data);
-                $("#dgreet").innerText = `Hello, ${data.name}`;
+                $("#dgreet").html(`Hello, ${data.name}`);
 
                 if(data.key){
                     $("#unsubscribe-btn").hidden = false;
 
-                    $("#dplan").innerHTML = "You have an active plan" // TODO: Remove useless newlines from the line below
+                    $("#dplan").html("You have an active plan"); // TODO: Remove useless newlines from the line below
                     let planHTML = `<div class="col">
                     <p>Plan: <span class="text-primary">${data.key.plan.type}</span></p>
                     <div class="progress" style="height: 20px;">
@@ -118,7 +118,7 @@ function loadDashboardData(){
                     <p class="text-muted">${keyStatus.requests} requests</p>
                     </div>`;
 
-                    $("#rowplan").innerHTML += planHTML;
+                    $("#rowplan").html($("#rowplan").html() + planHTML);
 
                     let expirationDate = new Date(data.key.expiration_date);
                     let currentDate = new Date();
@@ -140,10 +140,10 @@ function loadDashboardData(){
                     </div>
                     `
 
-                    $("#rowkey").innerHTML += keyHTML;
+                    $("#rowkey").html($("#rowkey").html() + keyHTML);
 
                 }else{
-                    $("#dplan").innerHTML = `You don't have an active plan yet. <a href="/plans">Click here</a> to subscribe to a plan`
+                    $("#dplan").html(`You don't have an active plan yet. <a href="/plans">Click here</a> to subscribe to a plan`)
                 }
                 
 
