@@ -9,7 +9,6 @@ from . import constants as CONSTANTS
 @cached(cache=TTLCache(maxsize=640*512, getsizeof=len, ttl=3 * 60), lock=Lock()) # TTL 3min
 def earthquake_query(data):
     data["format"] = "geojson"
-    # TODO: Check if GET requests are enough
     return requests.request("GET", CONSTANTS.EARTHQUAKE_API_ENDPOINT, params=data, headers={'Cache-Control': 'no-cache'}).json()
 
 @cached(cache=Cache(maxsize=640*512), lock=Lock())
@@ -24,5 +23,7 @@ async def dispatch(query_type: str, data):
     
 ALLOWED_QUERY_TYPES = {
     "earthquake": earthquake_query,
+    # In case you want to add features, just add the function names below
+    # Eg:
     # "weather": weather_query
 }

@@ -1,12 +1,11 @@
 import logging
 import bcrypt
 
-from .constants import LOGGER_NAME
+from .constants import LOGGER_NAME, LOGGING_FMT
 from .database import SessionLocal
 
 
 class hashabledict(dict):
-	""" A subclass of the built-in dict class that supports hashing. """
 	def __key(self) -> tuple:
 		return tuple((k,self[k]) for k in sorted(self))
 	def __hash__(self) -> int:
@@ -18,7 +17,7 @@ def setup_logging() -> logging.Logger:
 	logger = logging.getLogger(LOGGER_NAME)
 	logger.setLevel(logging.WARNING)
  
-	formatter = logging.Formatter('[%(asctime)s][%(levelname)s]: %(message)s')
+	formatter = logging.Formatter(LOGGING_FMT)
 	handler = logging.StreamHandler()
 	handler.setFormatter(formatter)
  

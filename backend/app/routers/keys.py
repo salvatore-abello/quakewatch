@@ -19,6 +19,8 @@ router = APIRouter(prefix="/keys", tags=["keys"])
 async def handle_key_purchase(request: Request, key: KeyPurchaseRequest, db: Session = Depends(get_db), 
                               Authorize: AuthJWT = Depends(), current_user: User = Depends(get_current_user),
                               csrf_token: str = Header(..., alias="X-CSRF-TOKEN")):
+    
+    """ Purchase a key """
 
     res = crud.create_key(db, key.plan, current_user)
     return {"msg": "Key purchased successfully", "data": res}
@@ -44,6 +46,8 @@ async def handle_get_key_status(request: Request, Authorize: AuthJWT = Depends()
 async def handle_key_delete(request: Request, db: Session = Depends(get_db),
                             Authorize: AuthJWT = Depends(), current_user: User = Depends(get_current_user),
                             csrf_token: str = Header(..., alias="X-CSRF-TOKEN")):
+    
+    """ Delete a key and its data """
     
     crud.delete_key_from_user(db, current_user)
     redis_client.delete_key(current_user.key)

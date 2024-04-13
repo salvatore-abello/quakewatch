@@ -1,9 +1,7 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 
 from .database import Base
-
-# DIVIDE THIS INTO SEPARATE FILES INSIDE A PACKAGE
 
 class User(Base):
     __tablename__ = "Users"
