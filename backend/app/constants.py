@@ -28,8 +28,8 @@ OPENAPI_TAGS = [
         "name": "query",
         "description": "Operations with querying. **Earthquake** queries are here.",
         "externalDocs": {
-            "description": "Add invgov API docs",
-            "url": "https://fastapi.tiangolo.com/",
+            "description": "terremoti opendata API",
+            "url": "https://developers.italia.it/it/api/terremoti-opendata.html",
         },
     },
     {
