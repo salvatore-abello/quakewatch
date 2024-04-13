@@ -1,0 +1,10 @@
+fastapi_another_jwt_auth
+cachetools
+requests
+uvicorn
+fastapi
+slowapi[redis]
+sqlalchemy
+mysqlclient
+bcrypt
+pydantic[email]
