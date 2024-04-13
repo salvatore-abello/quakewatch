@@ -23,11 +23,13 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-4 fixed-top">
         <a class="navbar-brand" href="#"><img src="/images/logo.png" width="48" class="d-inline-block align-top" alt=""></a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+        <button class="navbar-toggler" type="button" data-mdb-dropdown-init data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+              </svg>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
+            <ul class="navbar-nav mr-auto" id="navbar-list">
                 <li class="nav-item mx-2">
                     <a class="nav-link" href="/">Home</a>
                 </li>
@@ -36,6 +38,12 @@
                 </li>
                 <li class="nav-item mx-2">
                     <a class="nav-link" href="/login">Login</a>
+                </li>
+                <li class="nav-item mx-2">
+                    <a class="nav-link" href="/plans">Plans</a>
+                </li>
+                <li class="nav-item mx-2">
+                    <a class="nav-link" href="/dashboard">Dashboard</a>
                 </li>
                 <li class="nav-item mx-2">
                     <a class="nav-link" href="/map">Map</a>
@@ -57,7 +65,7 @@
                         </button>
                     </div>
                 </div>
-
+                <div class="row mt-5" id="rowkey"></div>
             </div>
 
         </div>
@@ -83,40 +91,61 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="/js/dashboard/common.js"></script>
 <script>
 
 function loadDashboardData(){
-
-    fetch("/api/users/current")
-    .then(response => {
-        if (response.status !== 200) {
-            window.location.href = "/login";
-        }
-        return response.json();
-    })
+    rfetch("/api/users/current")
+    .then(response => response.json())
     .then(
         data => {
-            fetch("/api/keys/status")
+            rfetch("/api/keys/status")
             .then(response => {return response.json()})
             .then(
-                keyStatus => {
-                    console.log(data);
-                    dgreet.innerText = `Hello, ${data.name}`;
-                    if(data.key){
-                        document.querySelector("#unsubscribe-btn").hidden = false;
-                        dplan.innerHTML = "You have an active plan" // TODO: Remove useless newlines from the line below
-                        let planHTML = `<div class="col">
-                        <p>Plan: <span class="text-primary">${data.key.plan.type}</span></p>
-                        <div class="progress" style="height: 20px;">
-                            <div class="progress-bar" role="progressbar" style="width: ${keyStatus.percentage}%;" aria-valuemin="0" aria-valuenow=${keyStatus.percentage} aria-valuemax="100">0%</div>
+            keyStatus => {
+                console.log(data);
+                $("#dgreet").innerText = `Hello, ${data.name}`;
+
+                if(data.key){
+                    $("#unsubscribe-btn").hidden = false;
+
+                    $("#dplan").innerHTML = "You have an active plan" // TODO: Remove useless newlines from the line below
+                    let planHTML = `<div class="col">
+                    <p>Plan: <span class="text-primary">${data.key.plan.type}</span></p>
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar" role="progressbar" style="width: ${keyStatus.percentage}%;" aria-valuemin="0" aria-valuenow=${keyStatus.percentage} aria-valuemax="100">0%</div>
+                    </div>
+                    <p class="text-muted">${keyStatus.requests} requests</p>
+                    </div>`;
+
+                    $("#rowplan").innerHTML += planHTML;
+
+                    let expirationDate = new Date(data.key.expiration_date);
+                    let currentDate = new Date();
+
+                    let differenceInTime = expirationDate.getTime() - currentDate.getTime();
+                    let differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
+
+                    let keyHTML = `
+                    <hr class="hr">    
+                    <div class="col">
+                        
+                        <h5>Your API Key</h5>
+                        <div class="input-group form-outline mb-3">
+                            <input type="text" class="form-control w-50" value="${data.key.key}" readonly/>
                         </div>
-                        <p class="text-muted">${keyStatus.requests} requests</p>
-                        </div>`;
-                        rowplan.innerHTML += planHTML;
-                    }else{
-                        dplan.innerHTML = `You don't have an active plan yet. <a href="/plans">Click here</a> to subscribe to a plan`
-                    }
-                    
+                    </div>
+                    <div class="col">
+                        <h5>Expires in ${differenceInDays} ${differenceInDays > 1 ? "days" : "day"}</h5>
+                    </div>
+                    `
+
+                    $("#rowkey").innerHTML += keyHTML;
+
+                }else{
+                    $("#dplan").innerHTML = `You don't have an active plan yet. <a href="/plans">Click here</a> to subscribe to a plan`
+                }
+                
 
                 }
             )
@@ -124,12 +153,8 @@ function loadDashboardData(){
     )
 }
 
-function getCSRFToken(){
-    return document.cookie.match(/csrf_access_token=([^;]+)/)[1]
-}
-
 $("#delete-plan-btn").click(() => {
-    fetch("/api/keys/delete", {method: "DELETE", headers: {
+    rfetch("/api/keys/delete", {method: "DELETE", headers: {
         "X-CSRF-TOKEN": getCSRFToken()
     }})
     .then(response => {

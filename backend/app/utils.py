@@ -1,6 +1,5 @@
 import logging
 import bcrypt
-from functools import wraps
 
 from .constants import LOGGER_NAME
 from .database import SessionLocal

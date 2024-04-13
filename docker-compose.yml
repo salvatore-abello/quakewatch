@@ -8,6 +8,7 @@ services:
       - DB_PASSWORD=$DB_ROOT_PASSWORD
       - DB_USERNAME=$DB_USERNAME
       - MYSQL_DATABASE=$MYSQL_DATABASE
+      - HCAPTCHA_SECRET=$HCAPTCHA_SECRET
     depends_on:
       - database
       - redis

@@ -14,7 +14,7 @@ class User(Base):
     surname = Column(String(30))
     password = Column(String(60))
 
-    key = relationship("Key", uselist=False, back_populates="user")
+    key = relationship("Key", uselist=False, back_populates="user", lazy="joined")
 
 class Plan(Base):
     __tablename__ = "Plans"
@@ -29,10 +29,10 @@ class Key(Base):
 
     IDKey = Column(Integer, primary_key=True)
     key = Column(String(36), unique=True, index=True)
-    expiration_date = Column(DateTime)  # Add the expiration date column
+    expiration_date = Column(DateTime)
 
     CODPlan = Column(Integer, ForeignKey("Plans.IDPlan"))
     CODUser = Column(Integer, ForeignKey("Users.IDUser"))
 
     user = relationship("User", back_populates="key")
-    plan = relationship("Plan", back_populates="keys")
+    plan = relationship("Plan", back_populates="keys", lazy="joined")

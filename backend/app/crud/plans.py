@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
-from .. import models, schemas
+
+from .. import models
+
 
 def get_plan(db: Session, plan_id: int):
     return db.query(models.Plan).filter(models.Plan.IDPlan == plan_id).first()

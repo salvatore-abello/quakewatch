@@ -1,21 +1,14 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, EmailStr
 from typing import Optional
 from datetime import datetime
 
 class UserBase(BaseModel):
     name: str
     surname: str
-    email: str
+    email: EmailStr
 
     class Config:
         orm_mode = True
-
-class UserCreate(UserBase):
-    password: str
-
-class UserLogin(BaseModel):
-    email: str
-    password: str
 
 class User(UserBase):
     IDUser: int
@@ -23,6 +16,13 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
+
+class UserCreate(UserBase):
+    password: str = Field(..., min_length=6)
+
+class UserLogin(BaseModel): # We don't need name and surname to login
+    email: str
+    password: str
 
 class PlanBase(BaseModel):
     IDPlan: int
@@ -37,7 +37,7 @@ class KeyCreate(KeyBase):
     plan: PlanBase
     user: User
 
-class KeyPurchaseRequest(BaseModel):
+class KeyPurchaseRequest(BaseModel): # Remove this?
     plan: PlanBase
 
     class Config:
@@ -46,7 +46,7 @@ class KeyPurchaseRequest(BaseModel):
 class Key(KeyBase):
     IDKey: int
     plan: Plan
-    expiration_date: datetime  # Add expiration_date field
+    expiration_date: datetime
 
     class Config:
         orm_mode = True

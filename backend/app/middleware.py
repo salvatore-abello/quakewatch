@@ -1,28 +1,23 @@
+import os
+import json
 import requests
 from threading import Lock
-from cachetools import TTLCache, cached
+from cachetools import TTLCache, Cache, cached
 from . import constants as CONSTANTS
 
 
-#@cached(cache=TTLCache(maxsize=640*512, getsizeof=len, ttl=3 * 60), lock=Lock()) # TTL 3min
+@cached(cache=TTLCache(maxsize=640*512, getsizeof=len, ttl=3 * 60), lock=Lock()) # TTL 3min
 def earthquake_query(data):
     data["format"] = "geojson"
     # TODO: Check if GET requests are enough
-    return requests.request("GET", CONSTANTS.EARTHQUAKE_API_ENDPOINT, params=data).json()
+    return requests.request("GET", CONSTANTS.EARTHQUAKE_API_ENDPOINT, params=data, headers={'Cache-Control': 'no-cache'}).json()
 
-def get_earthquake_history():pass
+@cached(cache=Cache(maxsize=640*512), lock=Lock())
+def get_free_earthquake_data():
+    with open(os.path.join("/app", "static", "files", "query-example.json"), "r") as f:
+        return json.loads(f.read())
 
-# @cached(cache=TTLCache(maxsize=640*512, getsizeof=len, ttl=2 * 60 * 60), lock=Lock()) # TTL 1h
-# def weather_query(data):
-#     # pioggia moderata (4 – 6 mm/h) pioggia forte (> 6 mm/h) rovescio (> 10 mm/h) nubifragio (> 30 mm/h)
-#     # https://api.3bmeteo.com/mobilev3/api_previsioni/home_geo/37.4226711/-122.0849872/en/0/1?format=json2&X-API-KEY=fhrwRdevqwq8r7q9UXTwP6lSX74g34jnQ6756tGo
-#     # https://api.3bmeteo.com/mobilev3/api_previsioni/esaorario/5375480/1085/0/6/en/?format=json2&X-API-KEY=fhrwRdevqwq8r7q9UXTwP6lSX74g34jnQ6756tGo
-#     # X-Api-Key: fhrwRdevqwq8r7q9UXTwP6lSX74g34jnQ6756tGo
-#     # format: json2
-#     # 
-#     return {}
-
-def dispatch(query_type: str, data):
+async def dispatch(query_type: str, data):
     if not (func:=ALLOWED_QUERY_TYPES.get(query_type)):
         return {"status": False, "data": {"msg": f"Unknown query type {query_type!r}"}}
     return func(data)

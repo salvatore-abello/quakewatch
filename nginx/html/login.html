@@ -23,11 +23,13 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-4 fixed-top">
         <a class="navbar-brand" href="#"><img src="/images/logo.png" width="48" class="d-inline-block align-top" alt=""></a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+        <button class="navbar-toggler" type="button" data-mdb-dropdown-init data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+              </svg>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
+            <ul class="navbar-nav mr-auto" id="navbar-list">
                 <li class="nav-item mx-2">
                     <a class="nav-link" href="/">Home</a>
                 </li>
@@ -36,6 +38,12 @@
                 </li>
                 <li class="nav-item mx-2">
                     <a class="nav-link" href="/login">Login</a>
+                </li>
+                <li class="nav-item mx-2">
+                    <a class="nav-link" href="/plans">Plans</a>
+                </li>
+                <li class="nav-item mx-2">
+                    <a class="nav-link" href="/dashboard">Dashboard</a>
                 </li>
                 <li class="nav-item mx-2">
                     <a class="nav-link" href="/map">Map</a>
@@ -86,16 +94,16 @@
         })
         .then(
             response => {
-                document.querySelector("#error").innerText = "";
-                document.querySelector("#success").innerText = "";
+                $("#error").innerText = "";
+                $("#success").innerText = "";
                 if (response.status === 200) {
                     console.log(document.cookie);
-                    document.querySelector("#success").innerText = "Logged in successfully";
+                    $("#success").innerText = "Logged in successfully";
                     setTimeout(function () {
                         window.location.href = "/dashboard"
-                    }, 2000);
+                    }, 1500);
                 } else {
-                    document.querySelector("#error").innerText = "Invalid email or password";
+                    $("#error").innerText = "Invalid email or password";
                 }
             }
         );

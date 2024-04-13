@@ -1,17 +1,13 @@
 from fastapi_another_jwt_auth import AuthJWT
 from fastapi import APIRouter, Request, Depends, Header, HTTPException
-from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from uuid import uuid4
 
 from . import get_current_user
-from ..redis import get_requests_number_from_key
+from .. import redis_client
 from .. import crud
-from ..schemas import Key, KeyPurchaseRequest, KeyCreate, User
-from ..utils import get_db, setup_logging
-from .. import models
-from ..constants import LIMITS
-from ..responses import *
+from ..schemas import KeyPurchaseRequest, User
+from ..utils import get_db
+from ..responses import * # TODO: Remove this
 
 
 router = APIRouter(prefix="/keys", tags=["keys"])
@@ -30,7 +26,15 @@ async def handle_key_purchase(request: Request, key: KeyPurchaseRequest, db: Ses
 @router.get("/status", response_model=NReqResponse)
 async def handle_get_key_status(request: Request, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db),
                                 current_user: User = Depends(get_current_user)):
-    nreqs, percentage = get_requests_number_from_key(current_user.key) if current_user.key else (0, 0)
+    
+
+    if hasattr(current_user, "key") and current_user.key \
+        and current_user.key.expiration_date < datetime.now():
+        crud.delete_key(db, current_user.key)
+        raise HTTPException(status_code=400, detail="Key has expired")
+
+    nreqs, percentage = redis_client.get_requests_number_from_key(current_user.key) \
+        if hasattr(current_user, "key") and current_user.key else (0, 0)
     return {"msg": "ok", "requests": nreqs, "percentage": percentage}
 
 
@@ -41,5 +45,6 @@ async def handle_key_delete(request: Request, db: Session = Depends(get_db),
                             Authorize: AuthJWT = Depends(), current_user: User = Depends(get_current_user),
                             csrf_token: str = Header(..., alias="X-CSRF-TOKEN")):
     
-    crud.delete_key(db, current_user)
+    crud.delete_key_from_user(db, current_user)
+    redis_client.delete_key(current_user.key)
     return {"msg": "Unsubscribed successfully", "data": None}

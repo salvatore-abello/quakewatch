@@ -7,3 +7,4 @@ slowapi[redis]
 sqlalchemy
 mysqlclient
 bcrypt
+pydantic[email]
