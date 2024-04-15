@@ -88,7 +88,7 @@ function loadEarthquakeMarkers(){
 
 function setupHexLayer(){
     hexLayer = L.hexbinLayer({ radius : 12, opacity: 0.5, duration: 500 })
-    hexLayer.colorScale().domain([ 1,500 ]).range(["#e0e0ff", "#750202"]);
+    hexLayer.colorScale().domain([ 1,500 ]).range(["#e2a8ff", "#5d00ff"]);
     hexLayer.colorScaleExtent([ 1,500 ]);
     hexLayer
         .radiusRange(function(d) {return d.length})
@@ -123,7 +123,7 @@ function loadHeatMap(){
     disableHexbinLayer();
     saveSettings("map", "heat")
     if (!heatLayer || !map.hasLayer(heatLayer)) {
-        heatLayer = L.heatLayer(geoJson2data(data), {radius: 50}).addTo(map);                
+        heatLayer = L.heatLayer(geoJson2data(data), {radius: 35}).addTo(map);                
     }
     
 }
@@ -189,6 +189,22 @@ function main(){
     loadSettings();
     loadMap();
 
+    start = moment(settings.start) || moment().subtract(29, 'days');
+    end = moment(settings.end) || moment();
+
+    $('#reportrange').daterangepicker({
+        startDate: start,
+        endDate: end,
+        ranges: {
+        'Today': [moment(), moment()],
+        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last Month': [moment().subtract(29, 'days'), moment()],
+        'Last 3 Months': [moment().subtract(89, 'days'), moment()],
+        'Last 5 Months': [moment().subtract(150, 'days'), moment()],
+        }
+    }, cb);
+
     rfetch("/api/users/current")
     .then(response => response.json())
     .then(userdata => {
@@ -199,6 +215,8 @@ function main(){
 }
 
 function cb(start, end) { // callback
+    saveSettings("start", start);
+    saveSettings("end", end);
     requestDataAndLoad(start, end);
 }
 
@@ -227,18 +245,5 @@ dropdownItems.forEach(function(item) {
         let ret = {none: clearMap, hexbin: loadHexbinMap, heatmap: loadHeatMap}[this.dataset.value]();
     });
 });
-
-$('#reportrange').daterangepicker({
-    startDate: start,
-    endDate: end,
-    ranges: {
-    'Today': [moment(), moment()],
-    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-    'Last Month': [moment().subtract(29, 'days'), moment()],
-    'Last 3 Months': [moment().subtract(89, 'days'), moment()],
-    'Last 5 Months': [moment().subtract(150, 'days'), moment()],
-    }
-}, cb);
 
 navigator.geolocation.getCurrentPosition(loadCoordsAndExecuteMain, fallbackCordsAndExecuteMain);

@@ -94,16 +94,16 @@
         })
         .then(
             response => {
-                $("#error").innerText = "";
-                $("#success").innerText = "";
+                $("#error").text("");
+                $("#success").text("");
                 if (response.status === 200) {
                     console.log(document.cookie);
-                    $("#success").innerText = "Logged in successfully";
+                    $("#success").text("Logged in successfully");
                     setTimeout(function () {
                         window.location.href = "/dashboard"
                     }, 1500);
                 } else {
-                    $("#error").innerText = "Invalid email or password";
+                    $("#error").text("Invalid email or password");
                 }
             }
         );

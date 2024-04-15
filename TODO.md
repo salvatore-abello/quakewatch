@@ -19,6 +19,8 @@
 + Remove useless files (`__pycache__`, etc...)
 + Remove useless import(s)
 + Improve backend/frontend source code
++ Fix plans if not logged in
++ Complete main page
 
 
 # TODOs

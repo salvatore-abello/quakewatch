@@ -107,7 +107,7 @@ function loadDashboardData(){
                 $("#dgreet").html(`Hello, ${data.name}`);
 
                 if(data.key){
-                    $("#unsubscribe-btn").hidden = false;
+                    $("#unsubscribe-btn").prop("hidden", false);
 
                     $("#dplan").html("You have an active plan"); // TODO: Remove useless newlines from the line below
                     let planHTML = `<div class="col">

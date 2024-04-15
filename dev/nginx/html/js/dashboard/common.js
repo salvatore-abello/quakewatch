@@ -1,7 +1,8 @@
 let loggedIn = false;
 
 function getCSRFToken(){
-    return document.cookie.match(/csrf_access_token=([^;]+)/)[1]
+    let csrf = document.cookie.match(/csrf_access_token=([^;]+)/);
+    return csrf ? csrf[1] : null;
 }
 
 async function rfetch(url, options) {
