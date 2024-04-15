@@ -1,3 +1,3 @@
 # quakewatch
 
-Robe di educazione civica blabla
+Add instructions on how to run it here
