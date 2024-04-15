@@ -21,13 +21,14 @@
 + Improve backend/frontend source code
 + Fix plans if not logged in
 + Complete main page
-
++ Improve the dashboard?
++ Production
+    + Minimize js/css/html(?) files (https://www.digitalocean.com/community/tools/minify) (https://www.toptal.com/developers/cssminifier) (https://www.atatus.com/tools/html-minify)
+    + Change secrets in .env
+    + Obfuscate paid/free js map files using https://www.preemptive.com/online-javascript-obfuscator/
 
 # TODOs
-- Production
-    - Minimize js/css/html(?) files (https://www.digitalocean.com/community/tools/minify) (https://www.toptal.com/developers/cssminifier) (https://www.atatus.com/tools/html-minify)
-    - Change secrets in .env
-    - Obfuscate paid/free js map files using https://www.preemptive.com/online-javascript-obfuscator/
+
 
 # Other
-- Improve the dashboard?
+
