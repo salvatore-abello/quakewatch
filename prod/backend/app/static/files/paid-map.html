@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.min.css"
+    rel="stylesheet"
+    />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" type="text/css" href="/api/files/map.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-4 fixed-top">
+        <a class="navbar-brand" href="#"><img src="/images/logo.png" width="48" class="d-inline-block align-top" alt=""></a>
+        <button class="navbar-toggler" type="button" data-mdb-dropdown-init data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+              </svg>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto" id="navbar-list">
+                <li class="nav-item mx-2">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item mx-2">
+                    <a class="nav-link" href="/plans">Plans</a>
+                </li>
+                <li class="nav-item mx-2">
+                    <a class="nav-link" href="/dashboard">Dashboard</a>
+                </li>
+                <li class="nav-item mx-2">
+                    <div id="reportrange"><a class="nav-link" href="#">Earthquakes</a></div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="fixed-bottom-right-geo-menu disable-selection">
+        <div class="dropdown h-100">
+            <div class="container d-flex flex-column justify-content-end h-100" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                <b class="mb-2 text-light">Maps</b>
+            </div>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li><a class="dropdown-item floating-dropdown-item" href="#" data-value="none">Clear</a></li>
+                <li><a class="dropdown-item floating-dropdown-item" href="#" data-value="heatmap">Heatmap</a></li>
+                <li><a class="dropdown-item floating-dropdown-item" href="#" data-value="hexbin">Hexbin</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="fixed-bottom-left-geo-menu disable-selection">
+        <div class="container">
+            <div class="d-lg-block" style="display: none">
+                <h5 class="my-1">Earthquake magnitudes</h5>
+                <div class="row">
+                    <div class="col">
+                        <div style="display: flex; align-items: center;">
+                            <i style="height:20px; width:20px; background: #000000"></i>
+                            <span style="margin-left: 5px;"><b>6 or greater</b></span>
+                        </div>
+                    </div>
+                </div>    
+                <div class="row">
+                    <div class="col">
+                        <div style="display: flex; align-items: center;">
+                            <i style="height:20px; width:20px; background: #750098"></i>
+                            <span style="margin-left: 5px;"><b>5 - 5.9</b></span>
+                        </div>
+                    </div>  
+                </div>   
+                <div class="row">
+                    <div class="col">
+                        <div style="display: flex; align-items: center;">
+                            <i style="height:20px; width:20px; background: #ff2525"></i>
+                            <span style="margin-left: 5px;"><b>4 - 4.9</b></span>
+                        </div>
+                    </div>  
+                </div> 
+                <div class="row">
+                    <div class="col">
+                        <div style="display: flex; align-items: center;">
+                            <i style="height:20px; width:20px; background: #ff7723"></i>
+                            <span style="margin-left: 5px;"><b>3 - 3.9</b></span>
+                        </div>
+                    </div>  
+                </div> 
+            </div>
+
+            <div class="row d-flex align-items-center mb-2">
+                <div class="col-md-8">
+                    <div class="form-check pt-1">
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                        <label class="form-check-label" for="flexCheckDefault">
+                            Disable points
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <button
+                    data-mdb-container="body"
+                    data-mdb-ripple-init
+                    data-mdb-popover-init
+                    data-mdb-placement="right"
+                    data-mdb-content="Earthquakes with magnitude less than 3 are not displayed, as there are too many of them."
+                    class="btn btn-primary btn-floating"
+                    style="width: 2rem; height: 2rem;"
+                    ><b>?</b></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <div id="map"></div>
+    <script src="/js/simpleheat.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://www.unpkg.com/leaflet.heat@0.2.0/src/HeatLayer.js"></script>
+    <script src="https://unpkg.com/pouchdb@^5.2.0/dist/pouchdb.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+	<script src="https://unpkg.com/leaflet.tilelayer.pouchdbcached@latest/L.TileLayer.PouchDBCached.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>    <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+    <script src="https://d3js.org/d3-hexbin.v0.2.min.js"></script>
+    <script src="https://unpkg.com/@asymmetrik/leaflet-d3@4/dist/leaflet-d3.js" charset="utf-8"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.umd.min.js"></script>
+    <script src="/js/dashboard/common.js"></script>
+    <script src="/api/files/map.js"></script>
+</body>
+</html>

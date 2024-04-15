@@ -1,0 +1,1 @@
+let loggedIn=!1;function getCSRFToken(){let a=document.cookie.match(/csrf_access_token=([^;]+)/);return a?a[1]:null}async function rfetch(a,b){try{const c=await fetch(a,b);return c.ok||(window.location.href="/login"),loggedIn||(loggedIn=!0,$("#navbar-list").append("<li class=\"nav-item mx-2\"><a class=\"nav-link\" href=\"/logout\">Logout</a></li>")),c}catch(a){console.log(a)}}
