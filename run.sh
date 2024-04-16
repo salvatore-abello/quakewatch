@@ -1,3 +1,5 @@
 #!/bin/bash
 git clone https://github.com/salvatore-abello/quakewatch/
-docker compose -f ./quakewatch/prod/docker-compose.yml up --build
+cd ./quakewatch/prod
+echo "Changed directory to: $(pwd)"
+docker compose  up --build
