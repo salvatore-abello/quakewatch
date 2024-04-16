@@ -25,3 +25,9 @@ By running this command, the production mode should be used
 
 ## Dashboard
 ![image](https://github.com/salvatore-abello/quakewatch/assets/107145304/7b3c57a7-27d6-476c-bff6-5290ebd66eb7)
+
+# Documentation
+
+## Backend
+ - Database: check [Documentation.pdf](Documentation.pdf)
+ - API: Go to /api/docs
