@@ -66,10 +66,21 @@
                     <input type="password" class="form-control" id="password" name="password" required />
                     <label for="password" class="form-label">password</label>
                 </div>
-                <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-primary" id="login-btn">Login</button>
-                    <a href="/forgot"><button type="button" class="btn btn-outline-primary" data-mdb-ripple-init data-mdb-ripple-color="dark">Forgot password</button></a>
+                
+                <div class="row my-2">
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary w-100" id="login-btn">Login</button>
+                    </div>
                 </div>
+                <div class="row my-2">
+                    <div class="col">
+                        <a href="/forgot">
+                            <button type="button" class="btn btn-outline-primary w-100" data-mdb-ripple-init data-mdb-ripple-color="dark">Forgot password</button>
+                        </a>
+                    </div>
+                </div>
+                
+
                 <p>Not registered? <a href="/register">Click here</a></p>
                 <p class="text-danger" id="error"></p>
                 <p class="text-success" id="success"></p>
