@@ -16,8 +16,8 @@ curl https://raw.githubusercontent.com/salvatore-abello/quakewatch/main/run.sh |
 
 By running this command, the production mode should be used
 ## Default ports:
- - Dev: 8080
- - Prod: 80
+ - Dev: `8080`
+ - Prod: `80`
 
 # Preview
 ## Interactive map
