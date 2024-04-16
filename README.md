@@ -6,7 +6,7 @@
 
 # What is quakewatch?
 
-Quakewatch is a Web Application written in `FastAPI` and other technologies/frameworks and was created for a school project. It deals with visualizing earthquake data and therefore analyzing territories, understanding which areas are the ones where earthquakes are most frequent.
+Quakewatch is a Web Application written in `FastAPI` + other technologies/frameworks and was created for a school project. It deals with visualizing earthquake data and therefore analyzing territories, understanding which areas are the ones where earthquakes are most frequent.
 
 # Get started
 The only requirements are:
