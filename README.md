@@ -30,4 +30,4 @@ By running this command, the production mode should be used
 
 ## Backend
  - Database: check [Documentation.pdf](Documentation.pdf)
- - API: Go to /api/docs
+ - API: Go to `/api/docs`
