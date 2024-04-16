@@ -38,5 +38,5 @@ By running this command, the production mode should be used
 # Documentation
 
 ## Backend
- - Database: check [Documentation.pdf](Documentation.pdf)
+ - Database: check [Documentation.pdf](DB.pdf)
  - API: Go to `/api/docs`
