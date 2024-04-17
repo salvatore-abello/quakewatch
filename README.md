@@ -24,6 +24,13 @@ By running this command, the production mode should be used
  - Dev: `8080`
  - Prod: `80`
 
+## Live demo
+### ⚠️ WARNING ⚠️
+This site does not use https so you _may_ not be able to view it.
+
+Click here: http://quakewatch.servebeer.com
+
+
 # Overview
 
 ![Overview](https://github.com/salvatore-abello/quakewatch/assets/107145304/5bbb407e-ad5b-41b4-b463-abcd40b28870)
