@@ -104,7 +104,7 @@ function loadDashboardData(){
             .then(
             keyStatus => {
                 console.log(data);
-                $("#dgreet").html(`Hello, ${data.name}`);
+                $("#dgreet").text(`Hello, ${data.name}`);
 
                 if(data.key){
                     $("#unsubscribe-btn").prop("hidden", false);

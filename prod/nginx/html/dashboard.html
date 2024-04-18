@@ -93,7 +93,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="/js/dashboard/common.js"></script>
 <script>
-function loadDashboardData(){rfetch("/api/users/current").then(a=>a.json()).then(a=>{rfetch("/api/keys/status").then(a=>a.json()).then(b=>{if($("#dgreet").html(`Hello, ${a.name}`),a.key){$("#unsubscribe-btn").prop("hidden",!1),$("#dplan").html("You have an active plan");let c=`<div class="col">
+function loadDashboardData(){rfetch("/api/users/current").then(a=>a.json()).then(a=>{rfetch("/api/keys/status").then(a=>a.json()).then(b=>{if($("#dgreet").text(`Hello, ${data.name}`),a.key){$("#unsubscribe-btn").prop("hidden",!1),$("#dplan").html("You have an active plan");let c=`<div class="col">
                     <p>Plan: <span class="text-primary">${a.key.plan.type}</span></p>
                     <div class="progress" style="height: 20px;">
                         <div class="progress-bar" role="progressbar" style="width: ${b.percentage}%;" aria-valuemin="0" aria-valuenow=${b.percentage} aria-valuemax="100">0%</div>
