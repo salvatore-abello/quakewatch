@@ -45,5 +45,5 @@ Click here: http://quakewatch.servebeer.com
 # Documentation
 
 ## Backend
- - Database: check [Documentation.pdf](DB.pdf)
+ - Database: check [DB.pdf](DB.pdf)
  - API: Go to `/api/docs`
