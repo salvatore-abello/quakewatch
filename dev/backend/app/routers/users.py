@@ -31,10 +31,10 @@ async def handle_register(request: Request, user: schemas.UserCreate,
     try:
         return crud.create_user(db, user)
     except IntegrityError as e:
-        return JSONResponse(content={"msg": "Email already in use"}, status_code=400)
+        return JSONResponse(content={"detail": "Email already in use"}, status_code=400)
 
 @router.post("/login", responses={200: {"description": "Successfully logged in"}, 
-                                  401: {"description": "Invalid credentials"}})
+                                  401: {"detail": "Invalid credentials"}})
 async def handle_login(request: Request, user: schemas.UserLogin, 
                       db: Session = Depends(utils.get_db), Authorize: AuthJWT = Depends()):
     if (user:=crud.check_login(db, user)):
@@ -45,4 +45,4 @@ async def handle_login(request: Request, user: schemas.UserLogin,
         
         return json_response
     
-    return JSONResponse(content={"msg": "Invalid credentials"}, status_code=401)
+    return JSONResponse(content={"detail": "Invalid credentials"}, status_code=401)
