@@ -96,7 +96,7 @@
 function loadDashboardData(){rfetch("/api/users/current").then(a=>a.json()).then(a=>{rfetch("/api/keys/status").then(a=>a.json()).then(b=>{if($("#dgreet").text(`Hello, ${a.name}`),a.key){$("#unsubscribe-btn").prop("hidden",!1),$("#dplan").html("You have an active plan");let c=`<div class="col">
                     <p>Plan: <span class="text-primary">${a.key.plan.type}</span></p>
                     <div class="progress" style="height: 20px;">
-                        <div class="progress-bar" role="progressbar" style="width: ${b.percentage}%;" aria-valuemin="0" aria-valuenow=${b.percentage} aria-valuemax="100">0%</div>
+                        <div class="progress-bar" role="progressbar" style="width: ${b.percentage}%;" aria-valuemin="0" aria-valuenow=${Math.round(b.percentage)} aria-valuemax="100">0%</div>
                     </div>
                     <p class="text-muted">${b.requests} requests</p>
                     </div>`;$("#rowplan").html($("#rowplan").html()+c);let d=new Date(a.key.expiration_date),e=new Date,f=d.getTime()-e.getTime(),g=Math.ceil(f/86400000),h=`
