@@ -9,7 +9,7 @@ MYSQL_DATABASE = os.getenv("MYSQL_DATABASE", "db")
 
 SQLALCHEMY_DATABASE_URL = f"mysql://{DB_USERNAME}:{DB_PASSWORD}@database/{MYSQL_DATABASE}"
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(SQLALCHEMY_DATABASE_URL, pool_recycle=60)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
