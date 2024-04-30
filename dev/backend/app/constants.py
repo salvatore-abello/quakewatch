@@ -16,7 +16,8 @@ LIMITS = {
 }
 KNOWN_CONTENT_TYPES = {
     "css": "text/css",
-    "js": "application/javascript"
+    "js": "application/javascript",
+    "html": "text/html",
 }
 
 OPENAPI_TAGS = [
