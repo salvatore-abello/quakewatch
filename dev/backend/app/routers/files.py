@@ -35,5 +35,7 @@ async def handle_request(filename: str, request: Request, db: Session = Depends(
     except (AuthJWTException, ValueError, KeyError) as e:
         file = f"free-{filename}"
 
+    known_content_type = constants.KNOWN_CONTENT_TYPES.get(filename.split(".")[-1], "text/plain")
+
     with open(os.path.join("/app", "static", "files", file), "r") as f:
-        return Response(content=f.read())
+        return Response(content=f.read(), headers={"Content-Type": known_content_type})

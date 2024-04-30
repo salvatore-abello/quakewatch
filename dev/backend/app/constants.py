@@ -14,6 +14,10 @@ LIMITS = {
     "standard": "500000/month",
     "professional": "1000000/month"
 }
+KNOWN_CONTENT_TYPES = {
+    "css": "text/css",
+    "js": "application/javascript"
+}
 
 OPENAPI_TAGS = [
     {
