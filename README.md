@@ -28,6 +28,7 @@ By running this command, the production mode should be used
 ### ⚠️ WARNING ⚠️
 This site does not use https so you _may_ not be able to view it. Please switch to http
 
+(currently down)
 Click here: http://quakewatch.servebeer.com
 
 
